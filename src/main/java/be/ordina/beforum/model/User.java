@@ -15,6 +15,8 @@ public class User {
 	private Address address;
 	private Date firstLogin;
 	private Date lastLogin;
+	private String mainZip;
+	private String mainCity;
 
 	public enum Gender {
 		MALE,

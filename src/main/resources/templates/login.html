@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>burgerForum</title>
+<head th:replace="fragments/header :: head" />
+<body>
+<div th:replace="fragments/header :: header" />
+
+<span class="caption">Inloggen met eID</span>
+
+<div class="section group">
+  <div class="col span_2_of_3">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <script src="https://www.java.com/js/deployJava.js"></script>
     <script th:inline="javascript">
@@ -19,9 +25,12 @@
             var version = '1.6';
             deployJava.runApplet(attributes, parameters, version);
     </script>
-</head>
-<body>
-    <h1>Welkom op burgerForum</h1>
-    <p>Voordat je kunt deelnemen, gelieve eerst je pas te gebruiken om in te loggen</p>
+  </div>
+    
+  <div class="col span_1_of_3">
+    <div th:replace="fragments/header :: sidebar" />
+  </div>
+</div>
+
 </body>
 </html>

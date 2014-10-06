@@ -25,9 +25,11 @@ import be.fedict.eid.applet.service.Address;
 import be.ordina.beforum.model.Proposition;
 import be.ordina.beforum.model.User;
 import be.ordina.beforum.model.Vote;
+import be.ordina.beforum.model.Zip;
 import be.ordina.beforum.repository.PropositionRepository;
 import be.ordina.beforum.repository.UserRepository;
 import be.ordina.beforum.repository.VoteRepository;
+import be.ordina.beforum.repository.ZipRepository;
 
 @Controller
 @Scope("session")
@@ -39,6 +41,10 @@ public class WebController {
 	private UserRepository users; 
 	@Autowired
 	private VoteRepository votes; 
+	@Autowired
+	private ZipRepository zipcodes; 
+
+	User currentUser=null;
 	
     @RequestMapping(value="/")
     public String index(HttpSession session, Model model) {
@@ -69,13 +75,12 @@ public class WebController {
     	}
 
     	Address address = (Address)session.getAttribute("eid.address");
-    	User user = logUser(id, address);
-    	session.setAttribute("authenticated_id", user.get_id());
+    	currentUser = logUser(id, address);
+    	session.setAttribute("authenticated_id", currentUser.get_id());
     	model.addAttribute("identity", id);
     	model.addAttribute("address", address);
-    	model.addAttribute("user", user);
+    	model.addAttribute("user", currentUser);
     	model.addAttribute("propositions", propositions.findByZipcode(Integer.parseInt(address.getZip())));
-    	List<Proposition> test = propositions.findByZipcode(Integer.parseInt(address.getZip()));
     	return "home";
     }   
 
@@ -100,6 +105,7 @@ public class WebController {
     	Address address = (Address)session.getAttribute("eid.address");
     	model.addAttribute("identity", id);
     	model.addAttribute("address", address);
+    	model.addAttribute("user", currentUser);
     	return "addproposition";
     }
 
@@ -160,19 +166,30 @@ public class WebController {
 
     private void registerVote (String userId, String propId, int direction) {
     	Proposition prop = propositions.findBy_id(propId);
-    	int voteCount = prop.getVotes();
+    	int votesFavor = prop.getVotesFavor();
+    	int votesAgainst = prop.getVotesAgainst();
     	
     	Vote previousVote = votes.findByPropositionAndVoter(propId, userId);
     	if (previousVote != null) {
     		if (previousVote.getDirection() == direction)
     			return;
-    		else 
-    			direction *= 2;
+    		else {
+    			
+    		}
     		votes.delete(previousVote);
     	}
     	
-    	voteCount += direction;
-    	prop.setVotes(voteCount);
+    	if (direction > 0) {
+    		votesFavor++;
+    		if (previousVote != null)
+    			votesAgainst--;
+    	} else { 
+    		votesAgainst++;
+    		if (previousVote != null)
+    			votesFavor--;
+    	}
+    	prop.setVotesFavor(votesFavor);
+    	prop.setVotesAgainst(votesAgainst);
     	propositions.save(prop);
     	
     	Vote vote = new Vote();
@@ -197,6 +214,9 @@ public class WebController {
 		User user = new User();
 		user.fromEID(id,  address);
 		user.setFirstLogin(new Date());
+		Zip zipInfo = zipcodes.findByZipcode(address.getZip());
+		user.setMainZip(zipInfo.getMainZipcode());
+		user.setMainCity(zipInfo.getMainTown());
 		return users.save(user);
 	}
 

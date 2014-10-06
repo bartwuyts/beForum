@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
-<head>
-<title>burgerForum</title>
+<head th:replace="fragments/header :: head" />
+<body>
+<div th:replace="fragments/header :: header" />
+
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script type="text/javascript">
 $.ajaxSetup ({
@@ -14,24 +16,22 @@ function vote(id,direction) {
                 function(data) { $("#votes").text(data); });
 }
 </script>
-<style>
-.voted {
-    background-color: lightgreen;
-}
-.othervoted {
-}
-</style>
-</head>
-<body>
-<p>Bekijk dit voorstel, <span th:text="${identity.getFirstName()}+' '+${identity.getName()}">anoniemeling</span>!</p>
-<a href="/">Terug naar overzicht</a>
-<h1 th:text="${proposition.title}">Title</h1>
-<span th:id="'votes'" th:text="${proposition.votes}">Stemmen</span>
-<form method="post">
-<input type="submit" name="favor" value="Voor" th:disabled="${vote gt 0}" th:class="${vote gt 0}? 'voted' : 'othervoted'"/>
-<input type="submit" name="against" value="Tegen" th:disabled="${vote lt 0}" th:class="${vote lt 0}? 'voted' : 'othervoted'"/>
-</form>
-<div th:text="${proposition.text}">Text
+
+<span class="caption" th:text="${proposition.title}">Voorstel</span>
+
+<div class="section group">
+  <div class="col span_2_of_3">
+    <div th:text="${proposition.text}">Inhoud</div>
+	<form method="post">
+	<input type="submit" name="favor" value="Voor" th:disabled="${vote gt 0}" th:class="${vote gt 0}? 'voted' : 'othervoted'"/>
+	<input type="submit" name="against" value="Tegen" th:disabled="${vote lt 0}" th:class="${vote lt 0}? 'voted' : 'othervoted'"/>
+	</form>
+  </div>
+
+  <div class="col span_1_of_3">
+    <div th:replace="fragments/header :: sidebar" />
+  </div>
 </div>
+
 </body>
 </html>

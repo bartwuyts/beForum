@@ -33,7 +33,7 @@ public class WebConfig {
          
         // curl -u user:password -k https://127.0.0.1:9000/greeting
          
-        final String keystoreFile = "C:\\Users\\bawy\\Documents\\workspace-sts-3.5.1.RELEASE\\burgerForum\\keystore.p12";
+        final String keystoreFile = "C:\\Users\\bawy\\Projecten\\beForum\\beForum\\keystore.p12";
         final String keystorePass = "burgerForum";
         final String keystoreType = "PKCS12";
         final String keystoreProvider = "SunJSSE";

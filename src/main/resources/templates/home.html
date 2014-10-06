@@ -1,21 +1,35 @@
 <!DOCTYPE html>
 <html>
-<head>
-<title>burgerForum</title>
-</head>
+<head th:replace="fragments/header :: head" />
 <body>
-<p>Welkom op burgerForum, <span th:text="${identity.getFirstName()}+' '+${identity.getName()}">anoniemeling</span>!</p>
-<span th:text="'Lid sinds '+${#dates.format(user.getFirstLogin())}">Lid sinds ?</span>
-<p>De gegevens voor gemeente <span th:text="${address.getMunicipality()}">onbekend</span> worden geladen...</p>
-<a href="logout">log out</a>
-<a href="moreinfo">more info</a>
-<a href="addproposition">nieuw voorstel</a>
-<div class="propositions" th:each="prop : ${propositions}">
- <div class="proposition">
-  <span th:id="'votes'" th:text="${prop.votes}">Stemmen</span>
-  <a th:href="'/proposition/'+${prop._id}"><span th:text="${prop.title}">Titel</span></a>
-  <span th:text="'('+${prop.creator.firstName}+' '+${prop.creator.lastName}+')'"></span>
- </div>
+<div th:replace="fragments/header :: header" />
+
+<span class="caption" th:text="'Voorstellen '+${user.mainCity}">Voorstellen gemeente</span>
+<span class="order">
+Toon eerst 
+<select>
+  <option value="time">recentste</option>
+  <option value="popularity">populairste</option>
+  <option value="controversial">opvallendste</option>
+</select>
+</span>
+
+<div class="section group">
+  <div class="col span_2_of_3">
+	<a href="addproposition">nieuw voorstel</a>
+	<div class="propositions" th:each="prop : ${propositions}">
+	 <div class="proposition">
+	  <span th:id="'votes'" th:text="${prop.votesFavor}+' voor'">voor</span>
+      <span th:id="'votes'" th:text="${prop.votesAgainst}+' tegen'">tegen</span>
+	  <a th:href="'/proposition/'+${prop._id}"><span th:text="${prop.title}">Titel</span></a>
+	  <span th:text="'('+${prop.creator.firstName}+' '+${prop.creator.lastName}+')'"></span>
+	 </div>
+	</div>
+  </div>
+
+  <div class="col span_1_of_3">
+    <div th:replace="fragments/header :: sidebar" />
+  </div>
 </div>
 </body>
 </html>

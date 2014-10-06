@@ -20,5 +20,6 @@ public class Proposition {
 	private UserSummary creator;
 	private String text;
 	private String title;
-	private int votes;
+	private int votesFavor;
+	private int votesAgainst;
 }

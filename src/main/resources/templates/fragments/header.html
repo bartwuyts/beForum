@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head th:fragment="head">
+ <link rel="stylesheet" type="text/css" href="/grid.css" />
+ <link rel="stylesheet" type="text/css" href="/beforum.css" />
+ <title>burgerForum</title>
+</head>
+
+<body>
+
+<div th:fragment="header">
+ <div class="section group">
+  <div class="col span_2_of_3">
+	<a href="/">
+	  <img src="/skyline.png" width="300px" height="100px"/>
+	  <span class="title">beForum</span>
+	  <img th:if="${identity}" class="communityFlag" src="/skyline.png" width="100px" height="100px"/>
+	</a>
+  </div>
+  <div th:if="${identity}" class="col span_1_of_3">
+   <span class="name" th:text="${identity}? ${identity.getFirstName()}+' '+${identity.getName()} : ''">anoniemeling</span>
+   <a class="logout" href="logout">uitloggen</a>
+  </div>
+ </div>
+</div>
+
+<div th:fragment="sidebar">
+  <h3>Wat is dit?</h3>
+  <h3>Waarvoor dient het?</h3>
+  <h3>Hoe gebruik ik dit?</h3>
+  <h3>OPGELET: je stemt hier NIET anoniem!</h3>
+  <h3>Blablabla</h3>
+</div>
+
+</body>
+</html>
