@@ -16,7 +16,7 @@ public class Proposition {
 	
 	@Id
 	private String _id;
-	private int zipcode;
+	private String zipcode;
 	private UserSummary creator;
 	private String text;
 	private String title;

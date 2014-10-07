@@ -11,8 +11,8 @@ import be.ordina.beforum.model.Proposition;
 public interface PropositionRepository extends PagingAndSortingRepository<Proposition, String> {
 
 	Proposition findBy_id(String id);
-    List<Proposition> findByZipcode(int zipcode);
-    Page<Proposition> findByZipcode(int zipcode, Pageable pageable);
+    List<Proposition> findByZipcode(String zipcode);
+    Page<Proposition> findByZipcode(String zipcode, Pageable pageable);
     List<Proposition> findByCreator(String creator);
 
 }

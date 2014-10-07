@@ -30,19 +30,17 @@ import be.ordina.beforum.repository.PropositionRepository;
 import be.ordina.beforum.repository.UserRepository;
 import be.ordina.beforum.repository.VoteRepository;
 import be.ordina.beforum.repository.ZipRepository;
+import be.ordina.beforum.services.PropositionService;
+import be.ordina.beforum.services.UserService;
 
 @Controller
 @Scope("session")
 public class WebController {
     
 	@Autowired
-	private PropositionRepository propositions; 
+	private PropositionService propositions; 
 	@Autowired
-	private UserRepository users; 
-	@Autowired
-	private VoteRepository votes; 
-	@Autowired
-	private ZipRepository zipcodes; 
+	private UserService users; 
 
 	User currentUser=null;
 	
@@ -75,12 +73,12 @@ public class WebController {
     	}
 
     	Address address = (Address)session.getAttribute("eid.address");
-    	currentUser = logUser(id, address);
+    	currentUser = users.logUser(id, address);
     	session.setAttribute("authenticated_id", currentUser.get_id());
     	model.addAttribute("identity", id);
     	model.addAttribute("address", address);
     	model.addAttribute("user", currentUser);
-    	model.addAttribute("propositions", propositions.findByZipcode(Integer.parseInt(address.getZip())));
+    	model.addAttribute("propositions", propositions.getByZip(address.getZip()));
     	return "home";
     }   
 
@@ -118,16 +116,8 @@ public class WebController {
     		return index(session, model);
     	Identity id = (Identity)session.getAttribute("eid.identity");
     	Address address = (Address)session.getAttribute("eid.address");
-    	Proposition prop=new Proposition();
-    	Proposition.UserSummary creator = prop.new UserSummary();
-    	creator.setId((String)auth);
-    	creator.setFirstName(id.getFirstName());
-    	creator.setLastName(id.getName());
-    	prop.setCreator(creator);
-    	prop.setZipcode(Integer.parseInt(address.getZip()));
-    	prop.setTitle(title);
-    	prop.setText(text);
-    	propositions.save(prop);
+    	propositions.save((String)auth, id.getFirstName(), id.getName(),
+    					  address.getZip(), title, text);
     	return identified(session, model);
     }   
 
@@ -141,8 +131,8 @@ public class WebController {
     	Address address = (Address)session.getAttribute("eid.address");
     	model.addAttribute("identity", id);
     	model.addAttribute("address", address);
-    	model.addAttribute("proposition", propositions.findBy_id(propId));
-    	Vote vote = votes.findByPropositionAndVoter(propId, (String)auth);
+    	model.addAttribute("proposition", propositions.get(propId));
+    	Vote vote = propositions.getVote(propId, (String)auth);
     	int voteDir=0;
     	if (vote != null)
     		voteDir = vote.getDirection();
@@ -153,71 +143,15 @@ public class WebController {
     @RequestMapping(value="/proposition/{propId}",method=RequestMethod.POST, params="favor")
     public String voteFavor(HttpSession session, Model model,
     			@PathVariable("propId") String propId) {
-    	registerVote ((String)session.getAttribute("authenticated_id"), propId, 1);
+    	propositions.registerVote ((String)session.getAttribute("authenticated_id"), propId, 1);
     	return proposition(session, model, propId);
     }
 
     @RequestMapping(value="/proposition/{propId}",method=RequestMethod.POST, params="against")
     public String voteAgainst(HttpSession session, Model model,
     			@PathVariable("propId") String propId) {
-    	registerVote ((String)session.getAttribute("authenticated_id"), propId, -1);
+    	propositions.registerVote ((String)session.getAttribute("authenticated_id"), propId, -1);
     	return proposition(session, model, propId);
     }
-
-    private void registerVote (String userId, String propId, int direction) {
-    	Proposition prop = propositions.findBy_id(propId);
-    	int votesFavor = prop.getVotesFavor();
-    	int votesAgainst = prop.getVotesAgainst();
-    	
-    	Vote previousVote = votes.findByPropositionAndVoter(propId, userId);
-    	if (previousVote != null) {
-    		if (previousVote.getDirection() == direction)
-    			return;
-    		else {
-    			
-    		}
-    		votes.delete(previousVote);
-    	}
-    	
-    	if (direction > 0) {
-    		votesFavor++;
-    		if (previousVote != null)
-    			votesAgainst--;
-    	} else { 
-    		votesAgainst++;
-    		if (previousVote != null)
-    			votesFavor--;
-    	}
-    	prop.setVotesFavor(votesFavor);
-    	prop.setVotesAgainst(votesAgainst);
-    	propositions.save(prop);
-    	
-    	Vote vote = new Vote();
-    	vote.setProposition(propId);
-    	vote.setDirection(direction);
-    	vote.setVoter(userId);
-    	vote.setWhen(new Date());
-    	votes.save(vote);
-    }
-
-	private User logUser(Identity id, Address address) {
-		User user = users.findByIdentityNationalNumber(id.getNationalNumber());
-		if (user == null) {
-			user = addUser(id, address);
-		}
-		user.setLastLogin(new Date());
-		users.save(user);
-		return user;
-	}
-	
-	private User addUser(Identity id, Address address) {
-		User user = new User();
-		user.fromEID(id,  address);
-		user.setFirstLogin(new Date());
-		Zip zipInfo = zipcodes.findByZipcode(address.getZip());
-		user.setMainZip(zipInfo.getMainZipcode());
-		user.setMainCity(zipInfo.getMainTown());
-		return users.save(user);
-	}
 
 }
