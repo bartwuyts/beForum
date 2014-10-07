@@ -4,7 +4,7 @@
 <body>
 <div th:replace="fragments/header :: header" />
 
-<span class="caption" th:text="${identity.getFirstName()}+' '+${identity.getName()}">Naam</span>
+<span class="caption" th:text="${user.getIdentity().getFirstName()}+' '+${user.getIdentity().getName()}">Naam</span>
 
 <div class="section group">
   <div class="col span_2_of_3">

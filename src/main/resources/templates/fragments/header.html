@@ -14,11 +14,11 @@
 	<a href="/">
 	  <img src="/skyline.png" width="300px" height="100px"/>
 	  <span class="title">beForum</span>
-	  <img th:if="${identity}" class="communityFlag" src="/skyline.png" width="100px" height="100px"/>
+	  <img th:if="${user}" class="communityFlag" th:src="'/flags/'+${user.getMainZip()}+'.png'" width="100px" height="100px"/>
 	</a>
   </div>
-  <div th:if="${identity}" class="col span_1_of_3">
-   <a class="name" href="moreinfo" th:text="${identity}? ${identity.getFirstName()}+' '+${identity.getName()} : ''">anoniemeling</a>
+  <div th:if="${user}" class="col span_1_of_3">
+   <a class="name" href="moreinfo" th:text="${user}? ${user.getIdentity().getFirstName()}+' '+${user.getIdentity().getName()} : ''">anoniemeling</a>
    <a class="logout" href="logout">uitloggen</a>
   </div>
  </div>

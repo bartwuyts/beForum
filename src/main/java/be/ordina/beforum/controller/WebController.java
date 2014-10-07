@@ -84,8 +84,6 @@ public class WebController {
     	byte[] photo = (byte[])session.getAttribute("eid.photo");
     	currentUser = users.logUser(id, address, photo);
     	session.setAttribute("authenticated_id", currentUser.get_id());
-    	model.addAttribute("identity", id);
-    	model.addAttribute("address", address);
     	model.addAttribute("user", currentUser);
     	model.addAttribute("propositions", propositions.getByZip(address.getZip()));
     	return "home";
@@ -96,11 +94,7 @@ public class WebController {
     	Object auth=session.getAttribute("authenticated_id");
     	if (auth==null)
     		return index(session, model);
-    	Identity id = (Identity)session.getAttribute("eid.identity");
-    	Address address = (Address)session.getAttribute("eid.address");
-    	model.addAttribute("identity", id);
-    	model.addAttribute("address", address);
-    	model.addAttribute("user", currentUser);
+		model.addAttribute("user", currentUser);
     	return "info";
     }   
 
@@ -119,11 +113,7 @@ public class WebController {
     	Object auth=session.getAttribute("authenticated_id");
     	if (auth==null)
     		return index(session, model);
-    	Identity id = (Identity)session.getAttribute("eid.identity");
-    	Address address = (Address)session.getAttribute("eid.address");
-    	model.addAttribute("identity", id);
-    	model.addAttribute("address", address);
-    	model.addAttribute("user", currentUser);
+		model.addAttribute("user", currentUser);
     	return "addproposition";
     }
 
@@ -147,10 +137,7 @@ public class WebController {
     	Object auth=session.getAttribute("authenticated_id");
     	if (auth==null)
     		return index(session, model);
-    	Identity id = (Identity)session.getAttribute("eid.identity");
-    	Address address = (Address)session.getAttribute("eid.address");
-    	model.addAttribute("identity", id);
-    	model.addAttribute("address", address);
+		model.addAttribute("user", currentUser);
     	model.addAttribute("proposition", propositions.get(propId));
     	Vote vote = propositions.getVote(propId, (String)auth);
     	int voteDir=0;
