@@ -1,14 +1,27 @@
 <!DOCTYPE html>
 <html>
-<head>
-<title>burgerForum</title>
-</head>
+<head th:replace="fragments/header :: head" />
 <body>
-<p>Dit is wat we over u weten:</p>
-<ul>
-<li th:text="'Nationaal nummer='+${identity.getNationalNumber()}"></li>
-<li>etc...</li>
-</ul>
-<a href="/">Home</a>
+<div th:replace="fragments/header :: header" />
+
+<span class="caption" th:text="${identity.getFirstName()}+' '+${identity.getName()}">Naam</span>
+
+<div class="section group">
+  <div class="col span_2_of_3">
+    <img src="/photo" class="IdPhoto"/>
+    Actief sinds <span th:text="${#calendars.format(user.getFirstLogin(),'dd MMMM yyyy')}"/>
+    <br/>
+    Gebruikte tags
+    <div>
+    Misbruik
+    <br/>
+    Gemeld misbruik
+    </div>
+  </div>
+
+  <div class="col span_1_of_3">
+    <div th:replace="fragments/header :: sidebar" />
+  </div>
+</div>
 </body>
 </html>

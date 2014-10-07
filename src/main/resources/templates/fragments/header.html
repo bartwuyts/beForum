@@ -18,7 +18,7 @@
 	</a>
   </div>
   <div th:if="${identity}" class="col span_1_of_3">
-   <span class="name" th:text="${identity}? ${identity.getFirstName()}+' '+${identity.getName()} : ''">anoniemeling</span>
+   <a class="name" href="moreinfo" th:text="${identity}? ${identity.getFirstName()}+' '+${identity.getName()} : ''">anoniemeling</a>
    <a class="logout" href="logout">uitloggen</a>
   </div>
  </div>

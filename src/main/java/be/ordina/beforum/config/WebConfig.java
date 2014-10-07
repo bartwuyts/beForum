@@ -21,6 +21,7 @@ public class WebConfig {
     	ServletRegistrationBean registration = new ServletRegistrationBean(new AppletServiceServlet(),"/applet-service");
     	Map<String,String> params = new HashMap<String,String>();
     	params.put("IncludeAddress", "true");
+    	params.put("IncludePhoto", "true");
     	registration.setInitParameters(params);
     	return registration;
     }

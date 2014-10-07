@@ -13,6 +13,7 @@ public class User {
 	private String _id;
 	private Identity identity;
 	private Address address;
+	private byte[] photo;
 	private Date firstLogin;
 	private Date lastLogin;
 	private String mainZip;
@@ -48,7 +49,9 @@ public class User {
 		private String city;
 	}
 		
-	public void fromEID(be.fedict.eid.applet.service.Identity id, be.fedict.eid.applet.service.Address addr) {
+	public void fromEID(be.fedict.eid.applet.service.Identity id, 
+						be.fedict.eid.applet.service.Address addr,
+						byte[] photo) {
 		identity = new Identity();
 		identity.setCardNumber(id.getCardNumber());
 		identity.setChipNumber(id.getChipNumber());
@@ -72,6 +75,7 @@ public class User {
 		address.setStreetAndNumber(addr.getStreetAndNumber());
 		address.setZip(addr.getZip());
 		address.setCity(addr.getMunicipality());
+		setPhoto(photo);
 	}
 
 }

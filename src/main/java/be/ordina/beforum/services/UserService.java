@@ -20,19 +20,19 @@ public class UserService {
 	@Autowired
 	private ZipRepository zipcodes; 
 
-	public User logUser(Identity id, Address address) {
+	public User logUser(Identity id, Address address, byte[] photo) {
 		User user = users.findByIdentityNationalNumber(id.getNationalNumber());
 		if (user == null) {
-			user = addUser(id, address);
+			user = addUser(id, address, photo);
 		}
 		user.setLastLogin(new Date());
 		users.save(user);
 		return user;
 	}
 	
-	public User addUser(Identity id, Address address) {
+	public User addUser(Identity id, Address address, byte[] photo) {
 		User user = new User();
-		user.fromEID(id,  address);
+		user.fromEID(id, address, photo);
 		user.setFirstLogin(new Date());
 		Zip zipInfo = zipcodes.findByZipcode(address.getZip());
 		user.setMainZip(zipInfo.getMainZipcode());

@@ -1,5 +1,8 @@
 package be.ordina.beforum.controller;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
@@ -7,10 +10,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -73,7 +81,8 @@ public class WebController {
     	}
 
     	Address address = (Address)session.getAttribute("eid.address");
-    	currentUser = users.logUser(id, address);
+    	byte[] photo = (byte[])session.getAttribute("eid.photo");
+    	currentUser = users.logUser(id, address, photo);
     	session.setAttribute("authenticated_id", currentUser.get_id());
     	model.addAttribute("identity", id);
     	model.addAttribute("address", address);
@@ -91,8 +100,19 @@ public class WebController {
     	Address address = (Address)session.getAttribute("eid.address");
     	model.addAttribute("identity", id);
     	model.addAttribute("address", address);
+    	model.addAttribute("user", currentUser);
     	return "info";
     }   
+
+    @RequestMapping(value="/photo")
+    @ResponseBody
+    public ResponseEntity<byte[]> photo(HttpSession session) {
+    	byte[] photo = (byte[])session.getAttribute("eid.photo");
+    	HttpHeaders responseHeaders = new HttpHeaders();
+    	responseHeaders.setContentType(MediaType.IMAGE_JPEG);
+    	responseHeaders.set("Content-Disposition", "attachment");
+    	return new ResponseEntity<byte[]>(photo, responseHeaders, HttpStatus.OK);
+    }
 
     @RequestMapping(value="/addproposition",method=RequestMethod.GET)
     public String addProposition(HttpSession session, Model model) {
