@@ -2,6 +2,9 @@ package be.ordina.beforum.config;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.apache.catalina.connector.Connector;
 import org.apache.coyote.http11.Http11NioProtocol;
@@ -34,7 +37,7 @@ public class WebConfig {
          
         // curl -u user:password -k https://127.0.0.1:9000/greeting
          
-        final String keystoreFile = "C:\\Users\\bawy\\Projecten\\beForum\\beForum\\keystore.p12";
+        final String keystoreFile = Paths.get("keystore.p12").toAbsolutePath().toString();
         final String keystorePass = "burgerForum";
         final String keystoreType = "PKCS12";
         final String keystoreProvider = "SunJSSE";
