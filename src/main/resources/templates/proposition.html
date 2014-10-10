@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
-<head th:replace="fragments/header :: head" />
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: head"></head>
 <body>
-<div th:replace="fragments/header :: header" />
+<div th:replace="fragments/header :: header"></div>
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script type="text/javascript">
@@ -29,7 +29,7 @@ function vote(id,direction) {
   </div>
 
   <div class="col span_1_of_3">
-    <div th:replace="fragments/header :: sidebar" />
+    <div th:replace="fragments/header :: sidebar"></div>
   </div>
 </div>
 

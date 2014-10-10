@@ -13,6 +13,6 @@ public interface PropositionRepository extends PagingAndSortingRepository<Propos
 	Proposition findBy_id(String id);
     List<Proposition> findByZipcode(String zipcode);
     Page<Proposition> findByZipcode(String zipcode, Pageable pageable);
-    List<Proposition> findByCreator(String creator);
+    List<Proposition> findByCreatorId(String creatorId);
 
 }

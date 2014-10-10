@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
-<head th:replace="fragments/header :: head" />
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: head"></head>
 <body>
-<div th:replace="fragments/header :: header" />
+<div th:replace="fragments/header :: header"></div>
 
 <span class="caption" th:text="'Voorstellen '+${user.mainCity}">Voorstellen gemeente</span>
 <span class="order">
@@ -28,7 +28,7 @@ Toon eerst
   </div>
 
   <div class="col span_1_of_3">
-    <div th:replace="fragments/header :: sidebar" />
+    <div th:replace="fragments/header :: sidebar"></div>
   </div>
 </div>
 </body>

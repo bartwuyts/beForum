@@ -1,16 +1,7 @@
 package be.ordina.beforum.controller;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,14 +21,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import be.fedict.eid.applet.service.DocumentType;
 import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.Address;
-import be.ordina.beforum.model.Proposition;
 import be.ordina.beforum.model.User;
 import be.ordina.beforum.model.Vote;
-import be.ordina.beforum.model.Zip;
-import be.ordina.beforum.repository.PropositionRepository;
-import be.ordina.beforum.repository.UserRepository;
-import be.ordina.beforum.repository.VoteRepository;
-import be.ordina.beforum.repository.ZipRepository;
 import be.ordina.beforum.services.PropositionService;
 import be.ordina.beforum.services.UserService;
 

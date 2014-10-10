@@ -2,8 +2,6 @@ package be.ordina.beforum.config;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.io.File;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.catalina.connector.Connector;
@@ -59,4 +57,5 @@ public class WebConfig {
          
         return factory;
     }
+    
 }
