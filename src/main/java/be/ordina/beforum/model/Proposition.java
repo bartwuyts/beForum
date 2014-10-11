@@ -1,5 +1,7 @@
 package be.ordina.beforum.model;
 
+import java.util.Date;
+
 import org.springframework.data.annotation.Id;
 
 import lombok.Data;
@@ -17,6 +19,7 @@ public class Proposition {
 	@Id
 	private String _id;
 	private String zipcode;
+	private Date created;
 	private UserSummary creator;
 	private String text;
 	private String title;

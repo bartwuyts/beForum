@@ -79,6 +79,7 @@ public class PropositionService {
     	creator.setLastName(authorName);
     	prop.setCreator(creator);
     	prop.setZipcode(zip);
+    	prop.setCreated(new Date());
     	prop.setTitle(title);
     	prop.setText(text);
     	return propositions.save(prop);

@@ -1,3 +1,8 @@
+body {
+	margin-left : 2em;
+    margin-right : 2em;
+}
+
 .title {
 	font-size : 100px;
 	color : black;
@@ -25,6 +30,39 @@
     margin-left : 5em;
 }
 
+.sidebar {
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    border: 1px solid;
+    
+    padding-top: 1em;
+    padding-bottom: 1em;
+    padding-left: 1em;
+    padding-right: 1em;
+    background-color : LightGray;
+}
+
+.proposition {
+    font-size : 1.5em;
+    clear : both;
+    margin-top : 1.5em;
+}
+
+.votes {
+    font-size : 0.45em;
+    float : left;
+    margin-right : 1em;
+}
+
+.proptitle {
+	float : left;
+    line-height : 0.85em;
+}
+
+.creator {
+    font-size : 0.45em;
+}
 
 .voted {
     background-color: lightgreen;

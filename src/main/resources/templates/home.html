@@ -4,26 +4,38 @@
 <body>
 <div th:replace="fragments/header :: header"></div>
 
-<span class="caption" th:text="'Voorstellen '+${user.mainCity}">Voorstellen gemeente</span>
-<span class="order">
-Toon eerst 
-<select>
-  <option value="time">recentste</option>
-  <option value="popularity">populairste</option>
-  <option value="controversial">opvallendste</option>
-</select>
-</span>
+<div class="section group">
+  <div class="col span_2_of_3">
+   <span class="caption" th:text="'Voorstellen '+${user.mainCity}">Voorstellen gemeente</span>
+   <span class="order">
+   Toon eerst 
+   <select>
+    <option value="time">recentste</option>
+    <option value="popularity">populairste</option>
+    <option value="controversial">opvallendste</option>
+   </select>
+  </span>
+ </div>
+ <div class="col span_1_of_3">
+  <a href="addproposition">nieuw voorstel</a>  
+ </div>
+</div>
 
 <div class="section group">
   <div class="col span_2_of_3">
-	<a href="addproposition">nieuw voorstel</a>
 	<div class="propositions" th:each="prop : ${propositions}">
 	 <div class="proposition">
-	  <span th:id="'votes'" th:text="${prop.votesFavor}+' voor'">voor</span>
-      <span th:id="'votes'" th:text="${prop.votesAgainst}+' tegen'">tegen</span>
-	  <a th:href="'/proposition/'+${prop._id}"><span th:text="${prop.title}">Titel</span></a>
-	  <span th:text="'('+${prop.creator.firstName}+' '+${prop.creator.lastName}+')'"></span>
+	  <span class="votes">
+	   <span th:id="'votes'" th:text="${prop.votesFavor}+' voor'">voor</span><br/>
+       <span th:id="'votes'" th:text="${prop.votesAgainst}+' tegen'">tegen</span><br/>
+       <span>reacties</span><br/>
+      </span>
+      <span class="proptitle">
+	   <a th:href="'/proposition/'+${prop._id}"><span th:text="${prop.title}">Titel</span></a><br/>
+	   <span class="creator" th:text="${#calendars.format(prop.created,'dd/MM/yy')}+' ingediend door '+${prop.creator.firstName}+' '+${prop.creator.lastName}"></span>
+	  </span>
 	 </div>
+	 <br/>
 	</div>
   </div>
 
