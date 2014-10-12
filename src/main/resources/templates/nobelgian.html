@@ -4,6 +4,13 @@
 <title>burgerForum</title>
 </head>
 <body>
-<p>I'm sorry. Only valid ids of Belgian citizens are allowed. Your id says you're <span th:text="${nationality}">unknown</span></p>
+<p>Enkel geldige identiteitskaarten van belgische burgers worden aanvaard.
+<ul>
+<li><span th:text="'nationaliteit '+${id.getNationality()}">unknown</span></li>
+<li><span th:text="'geldig van '+${#calendars.format(id.getCardValidityDateBegin(),'dd/MM/yy')}">geldig van</span></li>
+<li><span th:text="'geldig tot '+${#calendars.format(id.getCardValidityDateEnd(),'dd/MM/yy')}">geldig tot</span></li>
+<li><span th:text="'document type '+${id.getDocumentType()}">unknown</span></li>
+</ul>
+</p>
 </body>
 </html>

@@ -39,5 +39,9 @@ public class UserService {
 		user.setMainCity(zipInfo.getMainTown());
 		return users.save(user);
 	}
+	
+	public User findUser(String userId) {
+		return users.findBy_id(userId);
+	}
 
 }

@@ -58,10 +58,10 @@ public class WebController {
     	if (id==null) {
     		return index(session, model);
     	}
-    	if (id.getDocumentType()!=DocumentType.BELGIAN_CITIZEN ||
+    	if ((id.getDocumentType()!=DocumentType.BELGIAN_CITIZEN && id.getDocumentType()!=DocumentType.KIDS_CARD) ||
     			id.getCardValidityDateBegin().after(LocalDate.now()) ||
     			id.getCardValidityDateEnd().before(LocalDate.now())) {
-    		model.addAttribute("nationality", id.getNationality());
+    		model.addAttribute("id", id);
     		return "nobelgian";
     	}
 
@@ -74,19 +74,23 @@ public class WebController {
     	return "home";
     }   
 
-    @RequestMapping(value="/moreinfo")
-    public String info(HttpSession session, Model model) {
+    @RequestMapping(value="/moreinfo/{userId}")
+    public String info(HttpSession session, Model model,
+    		@PathVariable("userId") String userId) {
     	Object auth=session.getAttribute("authenticated_id");
     	if (auth==null)
     		return index(session, model);
+    	User user = users.findUser(userId);
+		model.addAttribute("author", user);
 		model.addAttribute("user", currentUser);
     	return "info";
     }   
 
-    @RequestMapping(value="/photo")
+    @RequestMapping(value="/photo/{userId}")
     @ResponseBody
-    public ResponseEntity<byte[]> photo(HttpSession session) {
-    	byte[] photo = (byte[])session.getAttribute("eid.photo");
+    public ResponseEntity<byte[]> photo(HttpSession session,
+    		@PathVariable("userId") String userId) {
+    	byte[] photo = (byte[])users.findUser(userId).getPhoto();    		
     	HttpHeaders responseHeaders = new HttpHeaders();
     	responseHeaders.setContentType(MediaType.IMAGE_JPEG);
     	responseHeaders.set("Content-Disposition", "attachment");
