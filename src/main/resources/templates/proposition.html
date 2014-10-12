@@ -17,7 +17,8 @@ function vote(id,direction) {
 }
 </script>
 
-<span class="caption" th:text="${proposition.title}">Voorstel</span>
+<span class="caption" th:text="${proposition.title}">Voorstel</span><br/>
+<span th:text="${#calendars.format(proposition.created,'dd/MM/yy')}+' ingediend door '"></span><a th:href="'/moreinfo/'+${proposition.creator.id}" th:text="${proposition.creator.firstName}+' '+${proposition.creator.lastName}">creator</a>
 
 <div class="section group">
   <div class="col span_2_of_3">
