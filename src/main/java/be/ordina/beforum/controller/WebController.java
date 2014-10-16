@@ -45,16 +45,25 @@ public class WebController {
     public String index(HttpSession session, Model model,
     		@RequestParam(value="tags", required=false) List<String>searchTags) {
     	Object auth=session.getAttribute("authenticated_id");
-    	if (auth!=null)
-    		return identified(session, model, searchTags);
-    	model.addAttribute("sessionId", session.getId() );
-        return "login";
+    	if (auth==null) {
+	    	model.addAttribute("sessionId", session.getId() );
+	        return "login";
+    	}
+    	
+    	model.addAttribute("user", currentUser);
+    	if (searchTags==null || searchTags.size()==0) {
+    		model.addAttribute("propositions", propositions.getByZip(currentUser.getAddress().getZip()));
+    	} else {
+    		model.addAttribute("propositions", propositions.getByZipAndTags(currentUser.getAddress().getZip(), searchTags));    		
+    	}
+		model.addAttribute("tagList", tags.findAll());
+    	return "home";
     }
 
     @RequestMapping(value="/logout")
     public String logout(HttpSession session, Model model) {
     	session.removeAttribute("authenticated_id");
-    	return index(session, model, null);
+    	return "redirect:/";
     }   
 
     @RequestMapping(value="/identified")
@@ -75,14 +84,7 @@ public class WebController {
     	byte[] photo = (byte[])session.getAttribute("eid.photo");
     	currentUser = users.logUser(id, address, photo);
     	session.setAttribute("authenticated_id", currentUser.get_id());
-    	model.addAttribute("user", currentUser);
-    	if (searchTags==null || searchTags.size()==0) {
-    		model.addAttribute("propositions", propositions.getByZip(address.getZip()));
-    	} else {
-    		model.addAttribute("propositions", propositions.getByZipAndTags(address.getZip(), searchTags));    		
-    	}
-		model.addAttribute("tagList", tags.findAll());
-    	return "home";
+    	return "redirect:/";
     }   
 
     @RequestMapping(value="/moreinfo/{userId}")
@@ -130,7 +132,7 @@ public class WebController {
     	Address address = (Address)session.getAttribute("eid.address");
     	propositions.save((String)auth, id.getFirstName(), id.getName(),
     					  address.getZip(), title, text, tags);
-    	return identified(session, model, null);
+    	return "redirect:/";
     }   
 
     @RequestMapping(value="/proposition/{propId}",method=RequestMethod.GET)
@@ -153,14 +155,14 @@ public class WebController {
     public String voteFavor(HttpSession session, Model model,
     			@PathVariable("propId") String propId) {
     	propositions.registerVote ((String)session.getAttribute("authenticated_id"), propId, 1);
-    	return proposition(session, model, propId);
+    	return "redirect:/proposition/"+propId;
     }
 
     @RequestMapping(value="/proposition/{propId}",method=RequestMethod.POST, params="against")
     public String voteAgainst(HttpSession session, Model model,
     			@PathVariable("propId") String propId) {
     	propositions.registerVote ((String)session.getAttribute("authenticated_id"), propId, -1);
-    	return proposition(session, model, propId);
+    	return "redirect:/proposition/"+propId;
     }
 
 }
