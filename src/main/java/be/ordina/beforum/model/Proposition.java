@@ -1,6 +1,7 @@
 package be.ordina.beforum.model;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 
@@ -25,4 +26,5 @@ public class Proposition {
 	private String title;
 	private int votesFavor;
 	private int votesAgainst;
+	private List<String> tags;
 }

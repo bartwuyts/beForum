@@ -2,6 +2,7 @@ package be.ordina.beforum.services;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,9 @@ public class PropositionService {
 	private PropositionRepository propositions; 
 	@Autowired
 	private VoteRepository votes; 
+
+	@Autowired
+	private TagService tagService; 
 
 	public PropositionService () {	
 	}
@@ -65,13 +69,17 @@ public class PropositionService {
     public List<Proposition> getByZip(String zip) {
     	return propositions.findByZipcode(zip);
     }
-    
+
+    public List<Proposition> getByZipAndTags(String zip, List<String> tags) {
+    	return propositions.findByZipcodeAndContainsTags(zip, tags);
+    }
+
     public Vote getVote(String propId, String auth) {
         return votes.findByPropositionAndVoter(propId, auth);    	
     }
     
     public Proposition save(String authorId, String authorFirstName, String authorName,
-    				 String zip, String title, String text) {
+    				 String zip, String title, String text, List<String> tags) {
     	Proposition prop=new Proposition();
     	Proposition.UserSummary creator = prop.new UserSummary();
     	creator.setId(authorId);
@@ -82,6 +90,16 @@ public class PropositionService {
     	prop.setCreated(new Date());
     	prop.setTitle(title);
     	prop.setText(text);
+    	for (int i=0; i<tags.size(); i++) {
+    		if (tags.get(i).startsWith("+")) {
+    			tags.set(i, tags.get(i).substring(1));
+    			if (tags.get(i).length()>0) {
+    				tags.set(i, tagService.addTag(tags.get(i)).get_id());
+    			}
+    		}
+    	}
+    	tags = tags.stream().filter(tag -> tag.length()>0).collect(Collectors.toList());
+    	prop.setTags(tags);
     	return propositions.save(prop);
     }
 }

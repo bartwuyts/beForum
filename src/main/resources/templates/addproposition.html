@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="fragments/header :: head"></head>
+
 <body>
 <div th:replace="fragments/header :: header"></div>
 
@@ -12,15 +13,38 @@
 	<div>
 	<span>Titel</span>
 	<div>
-	<input type="text" name="title"/>
+	<input id="add_title" type="text" name="title"/>
 	</div>
 	</div>
 	<div>
 	<span>Beschrijving</span>
 	<div>
-	<textarea name="text" maxlength="1000" cols="25" rows="10"></textarea>
+	<textarea id="add_body" name="text" maxlength="1000" cols="25" rows="10"></textarea>
 	</div>
 	</div>
+	<div>
+    <span>Tags</span>
+    <div>
+     <input id="add_tags" name="tags" type="hidden"></input>
+     <script th:inline="javascript">
+       $("#add_tags").select2({
+         placeholder: "Kies tags",
+         allowClear: true,
+         multiple: true,
+         //Allow manually entered text in drop down. 
+         createSearchChoice:function(term, data) { 
+           if ( $(data).filter( function() { 
+             return this.text.localeCompare(term)===0; 
+           }).length===0) { 
+             return {id:'+'+term, text:term}; 
+           } 
+         }, 
+         data: [[${tagList}]]
+       });
+     </script>
+    </div>
+    </div>
+    <br/>
 	<input type="submit" value="indienen"/>
 	</form>
   </div>

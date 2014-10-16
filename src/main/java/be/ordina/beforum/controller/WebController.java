@@ -1,6 +1,7 @@
 package be.ordina.beforum.controller;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
@@ -24,6 +25,7 @@ import be.fedict.eid.applet.service.Address;
 import be.ordina.beforum.model.User;
 import be.ordina.beforum.model.Vote;
 import be.ordina.beforum.services.PropositionService;
+import be.ordina.beforum.services.TagService;
 import be.ordina.beforum.services.UserService;
 
 @Controller
@@ -34,14 +36,17 @@ public class WebController {
 	private PropositionService propositions; 
 	@Autowired
 	private UserService users; 
+	@Autowired
+	private TagService tags; 
 
 	User currentUser=null;
 	
     @RequestMapping(value="/")
-    public String index(HttpSession session, Model model) {
+    public String index(HttpSession session, Model model,
+    		@RequestParam(value="tags", required=false) List<String>searchTags) {
     	Object auth=session.getAttribute("authenticated_id");
     	if (auth!=null)
-    		return identified(session, model);
+    		return identified(session, model, searchTags);
     	model.addAttribute("sessionId", session.getId() );
         return "login";
     }
@@ -49,14 +54,15 @@ public class WebController {
     @RequestMapping(value="/logout")
     public String logout(HttpSession session, Model model) {
     	session.removeAttribute("authenticated_id");
-    	return index(session, model);
+    	return index(session, model, null);
     }   
 
     @RequestMapping(value="/identified")
-    public String identified(HttpSession session, Model model) {
+    public String identified(HttpSession session, Model model,
+    		@RequestParam(value="tags", required=false) List<String>searchTags) {
     	Identity id = (Identity)session.getAttribute("eid.identity");
     	if (id==null) {
-    		return index(session, model);
+    		return index(session, model, null);
     	}
     	if ((id.getDocumentType()!=DocumentType.BELGIAN_CITIZEN && id.getDocumentType()!=DocumentType.KIDS_CARD) ||
     			id.getCardValidityDateBegin().after(LocalDate.now()) ||
@@ -70,7 +76,12 @@ public class WebController {
     	currentUser = users.logUser(id, address, photo);
     	session.setAttribute("authenticated_id", currentUser.get_id());
     	model.addAttribute("user", currentUser);
-    	model.addAttribute("propositions", propositions.getByZip(address.getZip()));
+    	if (searchTags==null || searchTags.size()==0) {
+    		model.addAttribute("propositions", propositions.getByZip(address.getZip()));
+    	} else {
+    		model.addAttribute("propositions", propositions.getByZipAndTags(address.getZip(), searchTags));    		
+    	}
+		model.addAttribute("tagList", tags.findAll());
     	return "home";
     }   
 
@@ -79,7 +90,7 @@ public class WebController {
     		@PathVariable("userId") String userId) {
     	Object auth=session.getAttribute("authenticated_id");
     	if (auth==null)
-    		return index(session, model);
+    		return index(session, model, null);
     	User user = users.findUser(userId);
 		model.addAttribute("author", user);
 		model.addAttribute("user", currentUser);
@@ -101,23 +112,25 @@ public class WebController {
     public String addProposition(HttpSession session, Model model) {
     	Object auth=session.getAttribute("authenticated_id");
     	if (auth==null)
-    		return index(session, model);
+    		return index(session, model, null);
 		model.addAttribute("user", currentUser);
+		model.addAttribute("tagList", tags.findAll());
     	return "addproposition";
     }
 
     @RequestMapping(value="/addproposition",method=RequestMethod.POST)
     public String addProposition(HttpSession session, Model model,
     			@RequestParam(value="title") String title,
-    			@RequestParam(value="text") String text) {
+    			@RequestParam(value="text") String text,
+    			@RequestParam(value="tags") List<String> tags) {
     	Object auth=session.getAttribute("authenticated_id");
     	if (auth==null)
-    		return index(session, model);
+    		return index(session, model, null);
     	Identity id = (Identity)session.getAttribute("eid.identity");
     	Address address = (Address)session.getAttribute("eid.address");
     	propositions.save((String)auth, id.getFirstName(), id.getName(),
-    					  address.getZip(), title, text);
-    	return identified(session, model);
+    					  address.getZip(), title, text, tags);
+    	return identified(session, model, null);
     }   
 
     @RequestMapping(value="/proposition/{propId}",method=RequestMethod.GET)
@@ -125,7 +138,7 @@ public class WebController {
     		@PathVariable("propId") String propId) {
     	Object auth=session.getAttribute("authenticated_id");
     	if (auth==null)
-    		return index(session, model);
+    		return index(session, model, null);
 		model.addAttribute("user", currentUser);
     	model.addAttribute("proposition", propositions.get(propId));
     	Vote vote = propositions.getVote(propId, (String)auth);

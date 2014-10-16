@@ -71,6 +71,13 @@ body {
 }
 
 
+#add_title, #add_body, #add_tags, .select2-container-multi .select2-choices {  
+    font-family: Arial, sans-serif;
+    font-size: 100%;
+    width: 40em;
+}
+
+
 .IdPhoto {
     float : right;
 }

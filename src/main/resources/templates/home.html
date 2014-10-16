@@ -15,6 +15,18 @@
     <option value="controversial">opvallendste</option>
    </select>
   </span>
+    <form method="GET">
+     <input id="search_tags" name="tags" type="hidden"></input>
+     <script th:inline="javascript">
+       $("#search_tags").select2({
+         placeholder: "Kies tags",
+         allowClear: true,
+         multiple: true,
+         data: [[${tagList}]]
+       });
+     </script>
+     <input type="submit" value="zoeken"/>
+    </form>
  </div>
  <div class="col span_1_of_3">
   <a href="addproposition">nieuw voorstel</a>  
