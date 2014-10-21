@@ -154,7 +154,7 @@ public class WebController {
     	if (vote != null)
     		voteDir = vote.getDirection();
     	model.addAttribute("vote", voteDir);
-    	model.addAttribute("comments", comments.find(propId, true));
+    	model.addAttribute("comments", comments.find(propId));
     	return "proposition";
     }
 
@@ -166,8 +166,20 @@ public class WebController {
     	HttpHeaders responseHeaders = new HttpHeaders();
     	responseHeaders.setContentType(MediaType.APPLICATION_JSON);
     	responseHeaders.set("Content-Disposition", "attachment");
-    	List<Comment> result = comments.find(parentId, top!=0);
+    	List<Comment> result = comments.find(parentId);
     	return new ResponseEntity<List<Comment>>(result, responseHeaders, HttpStatus.OK);
+    }
+
+    @RequestMapping(value="/voteComment/{id}/{direction}",method=RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<Integer> voteComment(HttpSession session, Model model,
+    		@PathVariable("id") String id,
+    		@PathVariable("direction") int direction) {
+    	HttpHeaders responseHeaders = new HttpHeaders();
+    	responseHeaders.setContentType(MediaType.APPLICATION_JSON);
+    	responseHeaders.set("Content-Disposition", "attachment");
+    	int result = comments.registerVote ((String)session.getAttribute("authenticated_id"), id, direction);
+    	return new ResponseEntity<Integer>(new Integer(result), responseHeaders, HttpStatus.OK);
     }
     
     @RequestMapping(value="/proposition/{propId}",method=RequestMethod.POST, params="favor")

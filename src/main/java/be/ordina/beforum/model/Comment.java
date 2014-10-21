@@ -23,4 +23,7 @@ public class Comment {
 	private boolean toplevel;
 	private String parentId;
 	private String text;
+	private int votesFavor;
+	private int votesAgainst;
+	private int childComments;
 }

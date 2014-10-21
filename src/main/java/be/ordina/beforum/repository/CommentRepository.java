@@ -9,6 +9,6 @@ import be.ordina.beforum.model.Comment;
 public interface CommentRepository extends PagingAndSortingRepository<Comment, String> {
 
 	Comment findBy_id(String id);
-	List<Comment> findByParentIdAndToplevel(String parentId, boolean toplevel);
+	List<Comment> findByParentId(String parentId);
 
 }

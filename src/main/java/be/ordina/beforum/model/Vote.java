@@ -13,7 +13,7 @@ public class Vote {
 	private String _id;
 	private String voter; // _id
 	private int direction;
-	private String proposition; // _id
+	private String id; // _id of Proposition or Comment
 	private Date when;
 
 }

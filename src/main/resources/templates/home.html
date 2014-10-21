@@ -19,7 +19,7 @@
      <input id="search_tags" name="tags" type="hidden"></input>
      <script th:inline="javascript">
        $("#search_tags").select2({
-         placeholder: "Kies tags",
+         placeholder: "Zoek tags",
          allowClear: true,
          multiple: true,
          data: [[${tagList}]]
@@ -40,7 +40,7 @@
 	  <span class="votes">
 	   <span th:id="'votes'" th:text="${prop.votesFavor}+' voor'">voor</span><br/>
        <span th:id="'votes'" th:text="${prop.votesAgainst}+' tegen'">tegen</span><br/>
-       <span>reacties</span><br/>
+       <span th:text="${prop.comments}+' reacties'"></span><br/>
       </span>
       <span class="proptitle">
 	   <a th:href="'/proposition/'+${prop._id}"><span th:text="${prop.title}">Titel</span></a><br/>

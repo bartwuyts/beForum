@@ -11,9 +11,18 @@ $.ajaxSetup ({
 });
 
 function vote(id,direction) {
-    jQuery.get('vote', 
+    jQuery.get('/vote', 
                 {id: id, direction: direction}, 
                 function(data) { $("#votes").text(data); });
+}
+
+function voteComment(id, direction) {
+    $.ajax({
+        url: "/voteComment/"+id+"/"+direction,
+        context: $("#comment_votes_"+id)
+    }).done(function(data) {
+        $(this).html(data);
+    });
 }
 </script>
 
@@ -32,7 +41,7 @@ function vote(id,direction) {
 	<form method="post">
 	 <input type="submit" name="favor" value="Voor" th:disabled="${vote gt 0}" th:class="${vote gt 0}? 'voted' : 'othervoted'"/>
 	 <input type="submit" name="against" value="Tegen" th:disabled="${vote lt 0}" th:class="${vote lt 0}? 'voted' : 'othervoted'"/>
-	 <textarea name="comment_text" rows="4" cols="50"></textarea>
+	 <textarea class="comment_textarea" name="comment_text"></textarea>
      <input type="submit" name="comment" value="toevoegen" />
 	</form>
 	<br/>
@@ -52,9 +61,16 @@ function vote(id,direction) {
 	            for (var comment in data) {
                     var created = new Date(data[comment].created);
 	            	$(this).append(
-	            		'<div class="comment"><div>'+data[comment].text+'</div>'+
+	            		'<div class="comment">'+
+	                     '<span class="commentvotes">'+
+                         '<img class="icon" src="/favor.png" onclick="voteComment(&quot;'+data[comment]._id+'&quot;,1)"/><br/>'+
+                         '<span id="comment_votes_'+data[comment]._id+'">'+(data[comment].votesFavor-data[comment].votesAgainst)+'</span><br/>'+
+                         '<img class="icon" src="/against.png" onclick="voteComment(&quot;'+data[comment]._id+'&quot;,-1)"/><br/>'+
+                        '</span>'+
+	            		'<div>'+data[comment].text+'</div>'+
 	            		'<div class="creator"><a href="/moreinfo/'+data[comment].creator.id+'">'+data[comment].creator.firstName+' '+data[comment].creator.lastName+'</a><span> op '+created.toLocaleString()+'</span></div>'+
-	            	    '<img class="expand" src="/expand.png" onclick="expand(&quot;'+data[comment]._id+'&quot;, &quot;'+propId+'&quot;)"/>'+
+	            	    '<img class="icon" src="/expand.png" onclick="expand(&quot;'+data[comment]._id+'&quot;, &quot;'+propId+'&quot;)"/>'+
+	            	    '<span>'+data[comment].childComments+' reacties</span>'+
 	            	    '<div id="sub_'+data[comment]._id+'" class="subcomments">'+
 	            	     '<form action="/subcomment/'+propId+'/'+data[comment]._id+'" method="post">'+
 	            	      '<textarea name="comment_text" rows="4" cols="40"></textarea>'+
@@ -69,12 +85,18 @@ function vote(id,direction) {
 	</script>
 	<div class="comments" th:each="comment : ${comments}">
 	 <div class="comment">
+      <span class="commentvotes">
+       <img class="icon" th:id="'comment_favor_'+${comment._id}" src="/favor.png" th:onclick="'voteComment(\''+${comment._id}+'\',1)'"/><br/>
+       <span th:id="'comment_votes_'+${comment._id}" th:text="${comment.votesFavor}-${comment.votesAgainst}">tegen</span><br/>
+       <img class="icon" th:id="'comment_against_'+${comment._id}" src="/against.png" th:onclick="'voteComment(\''+${comment._id}+'\',-1)'"/><br/>
+      </span>
 	  <div th:text="${comment.getText()}">commentaar</div>
       <div class="creator"><a th:href="'/moreinfo/'+${comment.creator.id}" th:text="${comment.creator.firstName}+' '+${comment.creator.lastName}">creator</a><span th:text="' op '+${#calendars.format(comment.created,'dd/MM/yy hh:mm')}"></span><a href="#"> reageren</a></div>
-      <img class="expand" src="/expand.png" th:onclick="'expand(\''+${comment._id}+'\',\''+${proposition._id}+'\')'"/>
+      <img class="icon" src="/expand.png" th:onclick="'expand(\''+${comment._id}+'\',\''+${proposition._id}+'\')'"/>
+      <span th:text="${comment.childComments}+' reacties'"></span>
       <div th:id="'sub_'+${comment._id}" class="subcomments">
        <form th:action="'/subcomment/'+${proposition._id}+'/'+${comment._id}" method="post">
-        <textarea name="comment_text" rows="4" cols="40"></textarea>
+        <textarea class="comment_textarea" name="comment_text" ></textarea>
 	    <input type="submit" name="comment" value="toevoegen" />
 	   </form>
  	   <div th:id="'subcomments_'+${comment._id}" >Laden...</div>

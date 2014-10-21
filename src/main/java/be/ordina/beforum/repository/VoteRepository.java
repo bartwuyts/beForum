@@ -9,7 +9,7 @@ import be.ordina.beforum.model.Vote;
 public interface VoteRepository extends PagingAndSortingRepository<Vote, String> {
 
     List<Vote> findByVoter(String voter);
-    List<Vote> findByProposition(String proposition);
-    Vote findByPropositionAndVoter(String proposition, String voter);
+    List<Vote> findById(String id);
+    Vote findByIdAndVoter(String Id, String voter);
 
 }

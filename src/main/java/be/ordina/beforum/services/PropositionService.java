@@ -31,7 +31,7 @@ public class PropositionService {
     	int votesFavor = prop.getVotesFavor();
     	int votesAgainst = prop.getVotesAgainst();
     	
-    	Vote previousVote = votes.findByPropositionAndVoter(propId, userId);
+    	Vote previousVote = votes.findByIdAndVoter(propId, userId);
     	if (previousVote != null) {
     		if (previousVote.getDirection() == direction)
     			return;
@@ -55,7 +55,7 @@ public class PropositionService {
     	propositions.save(prop);
     	
     	Vote vote = new Vote();
-    	vote.setProposition(propId);
+    	vote.setId(propId);
     	vote.setDirection(direction);
     	vote.setVoter(userId);
     	vote.setWhen(new Date());
@@ -75,7 +75,7 @@ public class PropositionService {
     }
 
     public Vote getVote(String propId, String auth) {
-        return votes.findByPropositionAndVoter(propId, auth);    	
+        return votes.findByIdAndVoter(propId, auth);    	
     }
     
     public Proposition save(String authorId, String authorFirstName, String authorName,
