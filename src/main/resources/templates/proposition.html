@@ -37,38 +37,52 @@ function vote(id,direction) {
 	</form>
 	<br/>
 	<h3>Commentaren</h3>
-	<div id="comments_tree"></div>
-
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jstree/3.0.6/jstree.min.js" type="text/javascript"></script>
-    <script type="text/javascript" th:inline="javascript">
-    $('#comments_tree').jstree({
-        "plugins" : ["wholerow"],
-        'core' : {
-            'data' : {
-                'url' : function( node ){
-                    // lets figure out the url - this function needs to
-                    // return the formed URL. If "node" is "-1" then
-                    // this is the top of the hierarchy and there's no parent
-                    // key. Otherwise, node is a jquery object of
-                    // the respective node from which we can fish out the
-                    // metadata needed. (added below at "metadata" : op )
-                    if( node.id === "#" ){
-                      return "/comments/1/"+[[${proposition._id}]];
-                    } else {
-                      return "/comments/0/"+node.id;
-                    }
-                  },
-                'data' : function(node) {
-                    return {
-                        'id' : node.id
-                    };
-                }
-            },
-        }
-    });
-    </script>
+	<script th:inline="javascript">
+	 function expand(id, propId) {
+		 $('#sub_'+id).toggle();
+		 $.ajax({
+			 url: "/comments/0/"+id,
+			 context: $("#subcomments_"+id)
+		 }).done(function(data) {
+			 if (data.length==0) {
+				$(this).html("Geen commentaren");
+			 }
+			 else {
+	            $(this).html("");
+	            for (var comment in data) {
+                    var created = new Date(data[comment].created);
+	            	$(this).append(
+	            		'<div class="comment"><div>'+data[comment].text+'</div>'+
+	            		'<div class="creator"><a href="/moreinfo/'+data[comment].creator.id+'">'+data[comment].creator.firstName+' '+data[comment].creator.lastName+'</a><span> op '+created.toLocaleString()+'</span></div>'+
+	            	    '<img class="expand" src="/expand.png" onclick="expand(&quot;'+data[comment]._id+'&quot;, &quot;'+propId+'&quot;)"/>'+
+	            	    '<div id="sub_'+data[comment]._id+'" class="subcomments">'+
+	            	     '<form action="/subcomment/'+propId+'/'+data[comment]._id+'" method="post">'+
+	            	      '<textarea name="comment_text" rows="4" cols="40"></textarea>'+
+	            	      '<input type="submit" name="comment" value="toevoegen" />'+
+	            	     '</form>'+
+	            	     '<div id="subcomments_'+data[comment]._id+'">Laden...</div>'+
+	            		'</div></div>');
+	            }
+			 }
+		 });
+	 }
+	</script>
+	<div class="comments" th:each="comment : ${comments}">
+	 <div class="comment">
+	  <div th:text="${comment.getText()}">commentaar</div>
+      <div class="creator"><a th:href="'/moreinfo/'+${comment.creator.id}" th:text="${comment.creator.firstName}+' '+${comment.creator.lastName}">creator</a><span th:text="' op '+${#calendars.format(comment.created,'dd/MM/yy hh:mm')}"></span><a href="#"> reageren</a></div>
+      <img class="expand" src="/expand.png" th:onclick="'expand(\''+${comment._id}+'\',\''+${proposition._id}+'\')'"/>
+      <div th:id="'sub_'+${comment._id}" class="subcomments">
+       <form th:action="'/subcomment/'+${proposition._id}+'/'+${comment._id}" method="post">
+        <textarea name="comment_text" rows="4" cols="40"></textarea>
+	    <input type="submit" name="comment" value="toevoegen" />
+	   </form>
+ 	   <div th:id="'subcomments_'+${comment._id}" >Laden...</div>
+      </div>
+     </div>
+    </div>
   </div>
-  
+
   <div class="col span_1_of_3">
     <div th:replace="fragments/header :: sidebar"></div>
   </div>

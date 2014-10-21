@@ -4,7 +4,6 @@ import java.util.Date;
 
 import org.springframework.data.annotation.Id;
 
-import be.ordina.beforum.model.Proposition.UserSummary;
 import lombok.Data;
 
 @Data

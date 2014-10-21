@@ -6,9 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import be.ordina.beforum.model.Proposition;
 import be.ordina.beforum.model.Comment;
-import be.ordina.beforum.model.Proposition.UserSummary;
 import be.ordina.beforum.repository.CommentRepository;
 
 @Service

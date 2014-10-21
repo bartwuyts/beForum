@@ -1,7 +1,6 @@
 package be.ordina.beforum.controller;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -26,7 +25,6 @@ import be.fedict.eid.applet.service.DocumentType;
 import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.Address;
 import be.ordina.beforum.model.Comment;
-import be.ordina.beforum.model.JsTreeComment;
 import be.ordina.beforum.model.User;
 import be.ordina.beforum.model.Vote;
 import be.ordina.beforum.services.CommentService;
@@ -156,24 +154,20 @@ public class WebController {
     	if (vote != null)
     		voteDir = vote.getDirection();
     	model.addAttribute("vote", voteDir);
+    	model.addAttribute("comments", comments.find(propId, true));
     	return "proposition";
     }
 
     @RequestMapping(value="/comments/{top}/{parentId}",method=RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<List<JsTreeComment>> comments(HttpSession session, Model model,
+    public ResponseEntity<List<Comment>> comments(HttpSession session, Model model,
     		@PathVariable("top") int top,
     		@PathVariable("parentId") String parentId) {
     	HttpHeaders responseHeaders = new HttpHeaders();
     	responseHeaders.setContentType(MediaType.APPLICATION_JSON);
     	responseHeaders.set("Content-Disposition", "attachment");
     	List<Comment> result = comments.find(parentId, top!=0);
-    	List<JsTreeComment> jsResult = new ArrayList<>();
-    	for (Comment comment : result) {
-    		JsTreeComment jsComment = new JsTreeComment(comment);
-    		jsResult.add(jsComment);
-    	}
-    	return new ResponseEntity<List<JsTreeComment>>(jsResult, responseHeaders, HttpStatus.OK);
+    	return new ResponseEntity<List<Comment>>(result, responseHeaders, HttpStatus.OK);
     }
     
     @RequestMapping(value="/proposition/{propId}",method=RequestMethod.POST, params="favor")

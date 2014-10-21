@@ -70,6 +70,26 @@ body {
 .othervoted {
 }
 
+.comment {
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    border: 1px solid;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    padding-left: 1em;
+    padding-right: 1em;
+    
+}
+
+.subcomments {
+	display : none;
+}
+
+.expand {
+	width: 1em;
+	height: auto;
+}
 
 #add_title, #add_body, #add_tags, .select2-container-multi .select2-choices {  
     font-family: Arial, sans-serif;
