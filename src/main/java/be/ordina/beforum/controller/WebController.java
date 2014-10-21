@@ -1,6 +1,7 @@
 package be.ordina.beforum.controller;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -13,7 +14,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,8 +25,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import be.fedict.eid.applet.service.DocumentType;
 import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.Address;
+import be.ordina.beforum.model.Comment;
+import be.ordina.beforum.model.JsTreeComment;
 import be.ordina.beforum.model.User;
 import be.ordina.beforum.model.Vote;
+import be.ordina.beforum.services.CommentService;
 import be.ordina.beforum.services.PropositionService;
 import be.ordina.beforum.services.TagService;
 import be.ordina.beforum.services.UserService;
@@ -38,6 +44,8 @@ public class WebController {
 	private UserService users; 
 	@Autowired
 	private TagService tags; 
+	@Autowired
+	private CommentService comments; 
 
 	User currentUser=null;
 	
@@ -127,7 +135,7 @@ public class WebController {
     			@RequestParam(value="tags") List<String> tags) {
     	Object auth=session.getAttribute("authenticated_id");
     	if (auth==null)
-    		return index(session, model, null);
+    		return "redirect:/";
     	Identity id = (Identity)session.getAttribute("eid.identity");
     	Address address = (Address)session.getAttribute("eid.address");
     	propositions.save((String)auth, id.getFirstName(), id.getName(),
@@ -150,6 +158,23 @@ public class WebController {
     	model.addAttribute("vote", voteDir);
     	return "proposition";
     }
+
+    @RequestMapping(value="/comments/{top}/{parentId}",method=RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<List<JsTreeComment>> comments(HttpSession session, Model model,
+    		@PathVariable("top") int top,
+    		@PathVariable("parentId") String parentId) {
+    	HttpHeaders responseHeaders = new HttpHeaders();
+    	responseHeaders.setContentType(MediaType.APPLICATION_JSON);
+    	responseHeaders.set("Content-Disposition", "attachment");
+    	List<Comment> result = comments.find(parentId, top!=0);
+    	List<JsTreeComment> jsResult = new ArrayList<>();
+    	for (Comment comment : result) {
+    		JsTreeComment jsComment = new JsTreeComment(comment);
+    		jsResult.add(jsComment);
+    	}
+    	return new ResponseEntity<List<JsTreeComment>>(jsResult, responseHeaders, HttpStatus.OK);
+    }
     
     @RequestMapping(value="/proposition/{propId}",method=RequestMethod.POST, params="favor")
     public String voteFavor(HttpSession session, Model model,
@@ -162,6 +187,35 @@ public class WebController {
     public String voteAgainst(HttpSession session, Model model,
     			@PathVariable("propId") String propId) {
     	propositions.registerVote ((String)session.getAttribute("authenticated_id"), propId, -1);
+    	return "redirect:/proposition/"+propId;
+    }
+
+    @RequestMapping(value="/proposition/{propId}",method=RequestMethod.POST, params="comment")
+    public String comment(HttpSession session, Model model,
+    			@PathVariable("propId") String propId,
+    			@RequestBody MultiValueMap<String,String> body) {
+    	Object auth=session.getAttribute("authenticated_id");
+    	if (auth==null)
+    		return "redirect:/";
+
+    	String comment = body.getFirst("comment_text");
+    	Identity id = (Identity)session.getAttribute("eid.identity");
+    	comments.addComment((String)auth, id.getFirstName(), id.getName(), propId, true, comment);
+    	return "redirect:/proposition/"+propId;
+    }
+
+    @RequestMapping(value="/subcomment/{propId}/{commentId}",method=RequestMethod.POST, params="comment")
+    public String subcomment(HttpSession session, Model model,
+			    @PathVariable("propId") String propId,
+    			@PathVariable("commentId") String commentId,
+    			@RequestBody MultiValueMap<String,String> body) {
+    	Object auth=session.getAttribute("authenticated_id");
+    	if (auth==null)
+    		return "redirect:/";
+
+    	String comment = body.getFirst("comment_text");
+    	Identity id = (Identity)session.getAttribute("eid.identity");
+    	comments.addComment((String)auth, id.getFirstName(), id.getName(), commentId, false, comment);
     	return "redirect:/proposition/"+propId;
     }
 
