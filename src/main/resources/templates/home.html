@@ -7,15 +7,17 @@
 <div class="section group">
   <div class="col span_2_of_3">
    <span class="caption" th:text="'Voorstellen '+${user.mainCity}">Voorstellen gemeente</span>
-   <span class="order">
-   Toon eerst 
-   <select>
-    <option value="time">recentste</option>
-    <option value="popularity">populairste</option>
-    <option value="controversial">opvallendste</option>
-   </select>
-  </span>
-    <form method="GET">
+   <form class="order" method="GET">
+    <span class="order">
+     Toon eerst 
+     <select name="order" onchange="this.form.submit()">
+      <option value="time">recentste</option>
+      <option value="popularity" th:selected="${order=='popularity'}">populairste</option>
+      <option value="controversial" th:selected="${order=='controversial'}">opvallendste</option>
+     </select>
+    </span>
+   </form>
+   <form method="GET">
      <input id="search_tags" name="tags" type="hidden"></input>
      <script th:inline="javascript">
        $("#search_tags").select2({

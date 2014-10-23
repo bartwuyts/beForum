@@ -7,6 +7,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -49,18 +50,29 @@ public class WebController {
 	
     @RequestMapping(value="/")
     public String index(HttpSession session, Model model,
-    		@RequestParam(value="tags", required=false) List<String>searchTags) {
+    		@RequestParam(value="tags", required=false) List<String>searchTags,
+			@RequestParam(value="order", required=false) String order) {
     	Object auth=session.getAttribute("authenticated_id");
     	if (auth==null) {
 	    	model.addAttribute("sessionId", session.getId() );
 	        return "login";
     	}
-    	
+    	Sort sorting=PropositionService.sortCreated;
+    	if (order != null) {
+    		if (order.equals("time")) {
+    			sorting = PropositionService.sortCreated;
+    		} else if (order.equals("popularity")) {
+    			sorting = PropositionService.sortPopularity;
+    		} else if (order.equals("controversial")) {
+    			sorting = PropositionService.sortControversial;    		
+    		}
+    		model.addAttribute("order", order);
+    	}
     	model.addAttribute("user", currentUser);
     	if (searchTags==null || searchTags.size()==0) {
-    		model.addAttribute("propositions", propositions.getByZip(currentUser.getAddress().getZip()));
+    		model.addAttribute("propositions", propositions.getByZip(currentUser.getAddress().getZip(), sorting));
     	} else {
-    		model.addAttribute("propositions", propositions.getByZipAndTags(currentUser.getAddress().getZip(), searchTags));    		
+    		model.addAttribute("propositions", propositions.getByZipAndTags(currentUser.getAddress().getZip(), searchTags, sorting));    		
     	}
 		model.addAttribute("tagList", tags.findAll());
     	return "home";
@@ -77,7 +89,7 @@ public class WebController {
     		@RequestParam(value="tags", required=false) List<String>searchTags) {
     	Identity id = (Identity)session.getAttribute("eid.identity");
     	if (id==null) {
-    		return index(session, model, null);
+    		return index(session, model, null, null);
     	}
     	if ((id.getDocumentType()!=DocumentType.BELGIAN_CITIZEN && id.getDocumentType()!=DocumentType.KIDS_CARD) ||
     			id.getCardValidityDateBegin().after(LocalDate.now()) ||
@@ -98,7 +110,7 @@ public class WebController {
     		@PathVariable("userId") String userId) {
     	Object auth=session.getAttribute("authenticated_id");
     	if (auth==null)
-    		return index(session, model, null);
+    		return index(session, model, null, null);
     	User user = users.findUser(userId);
 		model.addAttribute("author", user);
 		model.addAttribute("user", currentUser);
@@ -120,7 +132,7 @@ public class WebController {
     public String addProposition(HttpSession session, Model model) {
     	Object auth=session.getAttribute("authenticated_id");
     	if (auth==null)
-    		return index(session, model, null);
+    		return index(session, model, null, null);
 		model.addAttribute("user", currentUser);
 		model.addAttribute("tagList", tags.findAll());
     	return "addproposition";
@@ -146,7 +158,7 @@ public class WebController {
     		@PathVariable("propId") String propId) {
     	Object auth=session.getAttribute("authenticated_id");
     	if (auth==null)
-    		return index(session, model, null);
+    		return index(session, model, null, null);
 		model.addAttribute("user", currentUser);
     	model.addAttribute("proposition", propositions.get(propId));
     	Vote vote = propositions.getVote(propId, (String)auth);

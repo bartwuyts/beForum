@@ -25,5 +25,6 @@ public class Comment {
 	private String text;
 	private int votesFavor;
 	private int votesAgainst;
+	private int votesDiff;
 	private int childComments;
 }

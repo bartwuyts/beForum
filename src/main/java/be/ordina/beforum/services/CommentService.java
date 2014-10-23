@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import be.ordina.beforum.model.Comment;
@@ -52,6 +53,7 @@ public class CommentService {
     	Comment comment = comments.findBy_id(commentId);
     	int votesFavor = comment.getVotesFavor();
     	int votesAgainst = comment.getVotesAgainst();
+    	int votesDiff = comment.getVotesDiff();
     	
     	Vote previousVote = votes.findByIdAndVoter(commentId, userId);
     	if (previousVote != null) {
@@ -65,15 +67,24 @@ public class CommentService {
     	
     	if (direction > 0) {
     		votesFavor++;
-    		if (previousVote != null)
+    		if (previousVote != null) {
     			votesAgainst--;
+    			votesDiff+=2;
+    		} else {
+    			votesDiff++;
+    		}
     	} else { 
     		votesAgainst++;
-    		if (previousVote != null)
+    		if (previousVote != null) {
     			votesFavor--;
+    			votesDiff-=2;
+    		} else {
+    			votesDiff--;
+    		}
     	}
     	comment.setVotesFavor(votesFavor);
     	comment.setVotesAgainst(votesAgainst);
+    	comment.setVotesDiff(votesDiff);
     	comments.save(comment);
     	
     	Vote vote = new Vote();
@@ -86,7 +97,7 @@ public class CommentService {
     }
 
     public List<Comment> find(String parentId) {
-    	return comments.findByParentId(parentId);
+    	return comments.findByParentId(parentId, new Sort(new Sort.Order(Sort.Direction.DESC, "votesDiff")));
     }
 
     public Comment findId(String id) {

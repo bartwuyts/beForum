@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import be.ordina.beforum.model.Proposition;
@@ -23,6 +24,10 @@ public class PropositionService {
 	@Autowired
 	private TagService tagService; 
 
+	public static final Sort sortCreated = new Sort(new Sort.Order(Sort.Direction.DESC, "created"));
+	public static final Sort sortPopularity = new Sort(new Sort.Order(Sort.Direction.DESC, "votesDiff"));
+	public static final Sort sortControversial = new Sort(new Sort.Order(Sort.Direction.DESC, "votesTotal"));
+	
 	public PropositionService () {	
 	}
 	
@@ -30,6 +35,8 @@ public class PropositionService {
     	Proposition prop = propositions.findBy_id(propId);
     	int votesFavor = prop.getVotesFavor();
     	int votesAgainst = prop.getVotesAgainst();
+    	int votesTotal = prop.getVotesTotal();
+    	int votesDiff = prop.getVotesDiff();
     	
     	Vote previousVote = votes.findByIdAndVoter(propId, userId);
     	if (previousVote != null) {
@@ -40,18 +47,30 @@ public class PropositionService {
     		}
     		votes.delete(previousVote);
     	}
+    	else
+    		votesTotal++;
     	
     	if (direction > 0) {
     		votesFavor++;
-    		if (previousVote != null)
+    		if (previousVote != null) {
     			votesAgainst--;
+    			votesDiff+=2;
+    		} else {
+    			votesDiff++;
+    		}
     	} else { 
     		votesAgainst++;
-    		if (previousVote != null)
+    		if (previousVote != null) {
     			votesFavor--;
+    			votesDiff-=2;
+    		} else {
+    			votesDiff--;
+    		}
     	}
     	prop.setVotesFavor(votesFavor);
     	prop.setVotesAgainst(votesAgainst);
+    	prop.setVotesDiff(votesDiff);
+    	prop.setVotesTotal(votesTotal);
     	propositions.save(prop);
     	
     	Vote vote = new Vote();
@@ -66,12 +85,12 @@ public class PropositionService {
     	return propositions.findBy_id(propId);
     }
 
-    public List<Proposition> getByZip(String zip) {
-    	return propositions.findByZipcode(zip);
+    public List<Proposition> getByZip(String zip, Sort order) {
+    	return propositions.findByZipcode(zip, order);
     }
 
-    public List<Proposition> getByZipAndTags(String zip, List<String> tags) {
-    	return propositions.findByZipcodeAndContainsTags(zip, tags);
+    public List<Proposition> getByZipAndTags(String zip, List<String> tags, Sort order) {
+    	return propositions.findByZipcodeAndContainsTags(zip, tags, order);
     }
 
     public Vote getVote(String propId, String auth) {

@@ -26,6 +26,8 @@ public class Proposition {
 	private String title;
 	private int votesFavor;
 	private int votesAgainst;
+	private int votesDiff;
+	private int votesTotal;
 	private int comments;
 	private List<String> tags;
 }
