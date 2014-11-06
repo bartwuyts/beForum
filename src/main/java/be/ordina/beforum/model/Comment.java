@@ -3,7 +3,9 @@ package be.ordina.beforum.model;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.web.util.HtmlUtils;
 
+import be.ordina.beforum.helper.Helper;
 import lombok.Data;
 
 @Data
@@ -27,4 +29,8 @@ public class Comment {
 	private int votesAgainst;
 	private int votesDiff;
 	private int childComments;
+	
+	public String getText() {
+		return Helper.bbcode(HtmlUtils.htmlEscape(text));
+	}
 }

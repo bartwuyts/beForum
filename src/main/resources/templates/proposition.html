@@ -4,7 +4,6 @@
 <body>
 <div th:replace="fragments/header :: header"></div>
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script type="text/javascript">
 $.ajaxSetup ({
     cache: false
@@ -28,7 +27,7 @@ function voteComment(id, direction) {
 
 <div class="section group">
   <div class="col span_2_of_3">
-    <span class="caption" th:text="${proposition.title}">Voorstel</span><br/>
+    <span class="caption" th:utext="${proposition.getTitle()}">Voorstel</span><br/>
     <span th:text="${#calendars.format(proposition.created,'dd/MM/yy')}+' ingediend door '"></span><a th:href="'/moreinfo/'+${proposition.creator.id}" th:text="${proposition.creator.firstName}+' '+${proposition.creator.lastName}">creator</a>
  </div>
  <div class="col span_1_of_3">
@@ -37,11 +36,11 @@ function voteComment(id, direction) {
 
 <div class="section group">
   <div class="col span_2_of_3">
-    <div th:text="${proposition.text}">Inhoud</div>
+    <div th:utext="${proposition.text}">Inhoud</div>
 	<form method="post">
 	 <input type="submit" name="favor" value="Voor" th:disabled="${vote gt 0}" th:class="${vote gt 0}? 'voted' : 'othervoted'"/>
 	 <input type="submit" name="against" value="Tegen" th:disabled="${vote lt 0}" th:class="${vote lt 0}? 'voted' : 'othervoted'"/>
-	 <textarea class="comment_textarea" name="comment_text"></textarea>
+	 <textarea class="richinput" name="comment_text" rows="7" cols="80"></textarea>
      <input type="submit" name="comment" value="toevoegen" />
 	</form>
 	<br/>
@@ -73,13 +72,18 @@ function voteComment(id, direction) {
 	            	    '<span>'+data[comment].childComments+' reacties</span>'+
 	            	    '<div id="sub_'+data[comment]._id+'" class="subcomments">'+
 	            	     '<form action="/subcomment/'+propId+'/'+data[comment]._id+'" method="post">'+
-	            	      '<textarea name="comment_text" rows="4" cols="40"></textarea>'+
+	            	      '<textarea class="richinput" name="comment_text" rows="7" cols="80"></textarea>'+
 	            	      '<input type="submit" name="comment" value="toevoegen" />'+
 	            	     '</form>'+
 	            	     '<div id="subcomments_'+data[comment]._id+'">Laden...</div>'+
 	            		'</div></div>');
 	            }
 			 }
+			 $(".richinput").sceditor({
+		            plugins:"bbcode",
+		            style:"/sceditor/minified/jquery.sceditor.default.min.css",
+		            toolbar:"bold,italic,underline,size,color,image,emoticon",
+		            emoticonsRoot:"/sceditor/"});
 		 });
 	 }
 	</script>
@@ -90,13 +94,13 @@ function voteComment(id, direction) {
        <span th:id="'comment_votes_'+${comment._id}" th:text="${comment.votesFavor}-${comment.votesAgainst}">tegen</span><br/>
        <img class="icon" th:id="'comment_against_'+${comment._id}" src="/against.png" th:onclick="'voteComment(\''+${comment._id}+'\',-1)'"/><br/>
       </span>
-	  <div th:text="${comment.getText()}">commentaar</div>
+	  <div th:utext="${comment.text}">commentaar</div>
       <div class="creator"><a th:href="'/moreinfo/'+${comment.creator.id}" th:text="${comment.creator.firstName}+' '+${comment.creator.lastName}">creator</a><span th:text="' op '+${#calendars.format(comment.created,'dd/MM/yy hh:mm')}"></span><a href="#"> reageren</a></div>
       <img class="icon" src="/expand.png" th:onclick="'expand(\''+${comment._id}+'\',\''+${proposition._id}+'\')'"/>
       <span th:text="${comment.childComments}+' reacties'"></span>
       <div th:id="'sub_'+${comment._id}" class="subcomments">
        <form th:action="'/subcomment/'+${proposition._id}+'/'+${comment._id}" method="post">
-        <textarea class="comment_textarea" name="comment_text" ></textarea>
+        <textarea class="richinput comment_textarea" name="comment_text" rows="7" cols="80"></textarea>
 	    <input type="submit" name="comment" value="toevoegen" />
 	   </form>
  	   <div th:id="'subcomments_'+${comment._id}" >Laden...</div>

@@ -26,7 +26,7 @@ public class PropositionService {
 
 	public static final Sort sortCreated = new Sort(new Sort.Order(Sort.Direction.DESC, "created"));
 	public static final Sort sortPopularity = new Sort(new Sort.Order(Sort.Direction.DESC, "votesDiff"));
-	public static final Sort sortControversial = new Sort(new Sort.Order(Sort.Direction.DESC, "votesTotal"));
+	public static final Sort sortControversial = new Sort(new Sort.Order(Sort.Direction.DESC, "votesTotal"), new Sort.Order(Sort.Direction.DESC, "comments"));
 	
 	public PropositionService () {	
 	}

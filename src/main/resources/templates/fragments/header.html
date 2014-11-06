@@ -10,6 +10,17 @@
  <!-- Include Select2 skin and library -->
  <link href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.1/select2.css" rel="stylesheet"/>
  <script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.1/select2.js"></script>
+ 
+ <!-- SCEditor -->
+ <link rel="stylesheet" href="/sceditor/minified/themes/default.min.css" type="text/css" media="all" />
+ <script type="text/javascript" src="/sceditor/minified/jquery.sceditor.bbcode.min.js"></script>
+ <script type="text/javascript">
+        $(document).ready(function () { $(".richinput").sceditor({
+        	plugins:"bbcode",
+        	style:"/sceditor/minified/jquery.sceditor.default.min.css",
+        	toolbar:"bold,italic,underline,size,color,image,emoticon",
+        	emoticonsRoot:"/sceditor/"}); });
+ </script>
     
  <title>burgerForum</title>
 </head>

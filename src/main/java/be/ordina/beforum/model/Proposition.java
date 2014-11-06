@@ -4,7 +4,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.web.util.HtmlUtils;
 
+import be.ordina.beforum.helper.Helper;
 import lombok.Data;
 
 @Data
@@ -30,4 +32,11 @@ public class Proposition {
 	private int votesTotal;
 	private int comments;
 	private List<String> tags;
+	
+	public String getText() {
+		return Helper.bbcode(HtmlUtils.htmlEscape(text));
+	}
+	public String getTitle() {
+		return HtmlUtils.htmlEscape(title);
+	}
 }
