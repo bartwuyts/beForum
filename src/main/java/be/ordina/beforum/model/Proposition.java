@@ -17,6 +17,7 @@ public class Proposition {
 		private String id;
 		private String firstName;
 		private String lastName;
+		private String official;
 	}
 	
 	@Id

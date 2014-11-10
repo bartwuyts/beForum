@@ -28,7 +28,7 @@ function voteComment(id, direction) {
 <div class="section group">
   <div class="col span_2_of_3">
     <span class="caption" th:utext="${proposition.getTitle()}">Voorstel</span><br/>
-    <span th:text="${#calendars.format(proposition.created,'dd/MM/yy')}+' ingediend door '"></span><a th:href="'/moreinfo/'+${proposition.creator.id}" th:text="${proposition.creator.firstName}+' '+${proposition.creator.lastName}">creator</a>
+    <span th:text="${#calendars.format(proposition.created,'dd/MM/yy')}+' ingediend door '"></span><a th:href="'/moreinfo/'+${proposition.creator.id}" th:text="${proposition.creator.firstName}+' '+${proposition.creator.lastName}">creator</a><span class="official" th:if="${proposition.creator.official}" th:text="${proposition.creator.official}">official</span>
  </div>
  <div class="col span_1_of_3">
  </div>
@@ -95,7 +95,7 @@ function voteComment(id, direction) {
        <img class="icon" th:id="'comment_against_'+${comment._id}" src="/against.png" th:onclick="'voteComment(\''+${comment._id}+'\',-1)'"/><br/>
       </span>
 	  <div th:utext="${comment.text}">commentaar</div>
-      <div class="creator"><a th:href="'/moreinfo/'+${comment.creator.id}" th:text="${comment.creator.firstName}+' '+${comment.creator.lastName}">creator</a><span th:text="' op '+${#calendars.format(comment.created,'dd/MM/yy hh:mm')}"></span><a href="#"> reageren</a></div>
+      <div class="creator"><a th:href="'/moreinfo/'+${comment.creator.id}" th:text="${comment.creator.firstName}+' '+${comment.creator.lastName}">creator</a><span class="official" th:if="${comment.creator.official}" th:text="${comment.creator.official}">official</span><span th:text="' op '+${#calendars.format(comment.created,'dd/MM/yy hh:mm')}"></span></div>
       <img class="icon" src="/expand.png" th:onclick="'expand(\''+${comment._id}+'\',\''+${proposition._id}+'\')'"/>
       <span th:text="${comment.childComments}+' reacties'"></span>
       <div th:id="'sub_'+${comment._id}" class="subcomments">

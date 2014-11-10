@@ -24,7 +24,7 @@ public class CommentService {
 	@Autowired
 	private VoteRepository votes; 
 
-	public Comment addComment(String authorId, String authorFirstName, String authorName,
+	public Comment addComment(String authorId, String authorFirstName, String authorName, String authorOfficial,
 							  String parentId, boolean toplevel, String text) {
 		Comment comment = new Comment();
 		comment.setParentId(parentId);
@@ -32,6 +32,7 @@ public class CommentService {
     	creator.setId(authorId);
     	creator.setFirstName(authorFirstName);
     	creator.setLastName(authorName);
+    	creator.setOfficial(authorOfficial);
 		comment.setCreator(creator);
 		comment.setCreated(new Date());
 		comment.setToplevel(toplevel);

@@ -18,6 +18,7 @@ public class User {
 	private Date lastLogin;
 	private String mainZip;
 	private String mainCity;
+	private String official;
 
 	public enum Gender {
 		MALE,

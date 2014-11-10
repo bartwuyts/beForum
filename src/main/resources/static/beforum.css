@@ -55,6 +55,12 @@ body {
     margin-right : 1em;
 }
 
+.official {
+    font-size : 1.35em;
+    color : red;
+    margin-left : 1em;
+}
+
 .commentvotes {
     font-size : 0.9em;
     float : left;
@@ -67,7 +73,7 @@ body {
 }
 
 .creator {
-    font-size : 0.45em;
+    font-size : 0.65em;
 }
 
 .voted {

@@ -97,13 +97,14 @@ public class PropositionService {
         return votes.findByIdAndVoter(propId, auth);    	
     }
     
-    public Proposition save(String authorId, String authorFirstName, String authorName,
+    public Proposition save(String authorId, String authorFirstName, String authorName, String official,
     				 String zip, String title, String text, List<String> tags) {
     	Proposition prop=new Proposition();
     	Proposition.UserSummary creator = prop.new UserSummary();
     	creator.setId(authorId);
     	creator.setFirstName(authorFirstName);
     	creator.setLastName(authorName);
+    	creator.setOfficial(official);
     	prop.setCreator(creator);
     	prop.setZipcode(zip);
     	prop.setCreated(new Date());

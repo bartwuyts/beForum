@@ -46,7 +46,7 @@
       </span>
       <span class="proptitle">
 	   <a th:href="'/proposition/'+${prop._id}"><span th:utext="${prop.getTitle()}">Titel</span></a><br/>
-	   <div class="creator"><span th:text="${#calendars.format(prop.created,'dd/MM/yy')}+' ingediend door '"></span><a th:href="'/moreinfo/'+${prop.creator.id}" th:text="${prop.creator.firstName}+' '+${prop.creator.lastName}">creator</a></div>
+	   <div class="creator"><span th:text="${#calendars.format(prop.created,'dd/MM/yy')}+' ingediend door '"></span><a th:href="'/moreinfo/'+${prop.creator.id}" th:text="${prop.creator.firstName}+' '+${prop.creator.lastName}">creator</a><span class="official" th:if="${prop.creator.official}" th:text="${prop.creator.official}">official</span></div>
 	  </span>
 	 </div>
 	 <br/>

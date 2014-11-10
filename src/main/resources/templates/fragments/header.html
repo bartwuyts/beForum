@@ -38,6 +38,7 @@
   </div>
   <div th:if="${user}" class="col span_1_of_3">
    <a class="name" th:href="'/moreinfo/'+${user.get_id()}" th:text="${user.getIdentity().getFirstName()}+' '+${user.getIdentity().getName()}">anoniemeling</a>
+   <span class="official" th:if="${user.official}" th:text="${user.official}">Official</span>
    <a class="logout" href="/logout">uitloggen</a>
   </div>
  </div>

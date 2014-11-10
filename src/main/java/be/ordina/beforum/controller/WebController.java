@@ -148,7 +148,7 @@ public class WebController {
     		return "redirect:/";
     	Identity id = (Identity)session.getAttribute("eid.identity");
     	Address address = (Address)session.getAttribute("eid.address");
-    	propositions.save((String)auth, id.getFirstName(), id.getName(),
+    	propositions.save((String)auth, id.getFirstName(), id.getName(), currentUser.getOfficial(),
     					  address.getZip(), title, text, tags);
     	return "redirect:/";
     }   
@@ -218,7 +218,7 @@ public class WebController {
 
     	String comment = body.getFirst("comment_text");
     	Identity id = (Identity)session.getAttribute("eid.identity");
-    	comments.addComment((String)auth, id.getFirstName(), id.getName(), propId, true, comment);
+    	comments.addComment((String)auth, id.getFirstName(), id.getName(), currentUser.getOfficial(), propId, true, comment);
     	return "redirect:/proposition/"+propId;
     }
 
@@ -233,7 +233,7 @@ public class WebController {
 
     	String comment = body.getFirst("comment_text");
     	Identity id = (Identity)session.getAttribute("eid.identity");
-    	comments.addComment((String)auth, id.getFirstName(), id.getName(), commentId, false, comment);
+    	comments.addComment((String)auth, id.getFirstName(), id.getName(), currentUser.getOfficial(), commentId, false, comment);
     	return "redirect:/proposition/"+propId;
     }
 
