@@ -52,11 +52,14 @@ public class WebController {
     public String index(HttpSession session, Model model,
     		@RequestParam(value="tags", required=false) List<String>searchTags,
 			@RequestParam(value="order", required=false) String order) {
+    	System.err.println("in function 'index' - start");
     	Object auth=session.getAttribute("authenticated_id");
     	if (auth==null) {
 	    	model.addAttribute("sessionId", session.getId() );
+	    	System.err.println("in function 'index' - go to login page");
 	        return "login";
     	}
+    	System.err.println("in function 'index' - let's generate some data");
     	Sort sorting=PropositionService.sortCreated;
     	if (order != null) {
     		if (order.equals("time")) {
@@ -75,6 +78,7 @@ public class WebController {
     		model.addAttribute("propositions", propositions.getByZipAndTags(currentUser.getAddress().getZip(), searchTags, sorting));    		
     	}
 		model.addAttribute("tagList", tags.findAll());
+    	System.err.println("in function 'index' - go to home page");
     	return "home";
     }
 
