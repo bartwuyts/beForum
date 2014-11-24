@@ -19,5 +19,4 @@ public interface PropositionRepository extends PagingAndSortingRepository<Propos
 
     @Query(value="{ $and : [{ 'zipcode' : ?0 }, {tags : { $all : ?1 } }] }")
     List<Proposition> findByZipcodeAndContainsTags(String zipcode, List<String> tags, Sort sortable);
-
 }
