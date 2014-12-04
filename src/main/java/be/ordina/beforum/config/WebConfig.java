@@ -26,7 +26,7 @@ public class WebConfig {
     	registration.setInitParameters(params);
     	return registration;
     }
-    
+    /*
     @Bean
     public EmbeddedServletContainerFactory servletContainer() {
          
@@ -41,7 +41,9 @@ public class WebConfig {
         final String keystoreProvider = "SunJSSE";
         final String keystoreAlias = "tomcat";
      
+        System.out.println("start of servletContainer");
         TomcatEmbeddedServletContainerFactory factory = new TomcatEmbeddedServletContainerFactory();
+        System.out.println("servletContainer step 1");
         factory.addConnectorCustomizers((TomcatConnectorCustomizer) (Connector con) -> {
             con.setScheme("https");
             con.setSecure(true);
@@ -53,9 +55,10 @@ public class WebConfig {
             proto.setProperty("keystoreProvider", keystoreProvider);
             proto.setKeyAlias(keystoreAlias);
         });
+        System.out.println("servletContainer done");
      
          
         return factory;
     }
-    
+    */
 }
