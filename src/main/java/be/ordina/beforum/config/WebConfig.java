@@ -26,7 +26,7 @@ public class WebConfig {
     	registration.setInitParameters(params);
     	return registration;
     }
-    /*
+    
     @Bean
     public EmbeddedServletContainerFactory servletContainer() {
          
@@ -60,5 +60,5 @@ public class WebConfig {
          
         return factory;
     }
-    */
+    
 }
