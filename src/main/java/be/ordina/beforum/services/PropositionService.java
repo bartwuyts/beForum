@@ -12,8 +12,6 @@ import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
-import com.mongodb.DBObject;
-
 import be.ordina.beforum.model.Proposition;
 import be.ordina.beforum.model.Vote;
 import be.ordina.beforum.repository.PropositionRepository;
@@ -33,9 +31,12 @@ public class PropositionService {
 	@Autowired
 	private TagService tagService; 
 
+	private static final String votesDiff="votesDiff";
+	private static final String votesTotal="votesTotal";
+	
 	public static final Sort sortCreated = new Sort(new Sort.Order(Sort.Direction.DESC, "created"));
-	public static final Sort sortPopularity = new Sort(new Sort.Order(Sort.Direction.DESC, "votesDiff"));
-	public static final Sort sortControversial = new Sort(new Sort.Order(Sort.Direction.DESC, "votesTotal"), new Sort.Order(Sort.Direction.DESC, "comments"));
+	public static final Sort sortPopularity = new Sort(new Sort.Order(Sort.Direction.DESC, votesDiff));
+	public static final Sort sortControversial = new Sort(new Sort.Order(Sort.Direction.DESC, votesTotal), new Sort.Order(Sort.Direction.DESC, "comments"));
 	
 	public PropositionService () {	
 	}
@@ -95,23 +96,22 @@ public class PropositionService {
     }
 
     public List<Proposition> getByZip(String zip, Sort order) {
-    	//return propositions.findByZipcode(zip, order);
     	TypedAggregation<Proposition> agg = Aggregation.newAggregation(Proposition.class,
     			Aggregation.project("created","creator","text","title","votesFavor","votesAgainst","votesDiff","comments")
-    				.andExpression("votesFavor + votesAgainst").as("votesTotal")
-    				.andExpression("votesFavor - votesAgainst").as("votesDiff"),
+    				.andExpression("votesFavor + votesAgainst").as(votesTotal)
+    				.andExpression("votesFavor - votesAgainst").as(votesDiff),
     			Aggregation.sort(order)
     			);
     	return mongoTemplate.aggregate(agg, Proposition.class).getMappedResults();
     }
 
     public List<Proposition> getByZipAndTags(String zip, List<String> tags, Sort order) {
-    	//return propositions.findByZipcodeAndContainsTags(zip, tags, order);
     	TypedAggregation<Proposition> agg = Aggregation.newAggregation(Proposition.class,
-    			Aggregation.project("created","creator","text","title","votesFavor","votesAgainst","votesDiff","comments")
-    				.andExpression("votesFavor + votesAgainst").as("votesTotal")
-    				.andExpression("votesFavor - votesAgainst").as("votesDiff"),
     			Aggregation.match(Criteria.where("tags").all(tags)),
+    			Aggregation.project("created","creator","text","title","votesFavor","votesAgainst",
+    								"votesDiff","comments")
+    				.andExpression("votesFavor + votesAgainst").as(votesTotal)
+    				.andExpression("votesFavor - votesAgainst").as(votesDiff),
     			Aggregation.sort(order)
     			);
     	return mongoTemplate.aggregate(agg, Proposition.class).getMappedResults();
