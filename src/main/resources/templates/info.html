@@ -4,18 +4,21 @@
 <body>
 <div th:replace="fragments/header :: header"></div>
 
-<span class="caption" th:text="${author.getIdentity().getFirstName()}+' '+${author.getIdentity().getName()}">Naam</span>
-
-<div class="section group">
-  <div class="col span_2_of_3">
-    <img th:src="'/photo/'+${author.get_id()}" class="IdPhoto"/>
-    Actief sinds <span th:text="${#calendars.format(author.getFirstLogin(),'dd MMMM yyyy')}"></span>
-    <br/>
-    Gebruikte tags
-  </div>
-
-  <div class="col span_1_of_3">
-    <div th:replace="fragments/header :: sidebar"></div>
+<br/>
+<br/>
+<div class="row collapse">
+  <div class="body">
+    <div class="row">
+		<span class="caption" th:text="${author.getIdentity().getFirstName()}+' '+${author.getIdentity().getName()}">Naam</span>
+		<div class="row">
+		    <img th:src="'/photo/'+${author.get_id()}" />
+		</div>
+        <div class="row">
+		    Actief sinds <span th:text="${#calendars.format(author.getFirstLogin(),'dd MMMM yyyy')}"></span>
+		    <br/>
+		    Gebruikte tags
+		</div>
+	</div>
   </div>
 </div>
 </body>

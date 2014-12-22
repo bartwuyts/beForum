@@ -1,5 +1,7 @@
 package be.ordina.beforum.services;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,7 +43,7 @@ public class PropositionService {
 	public PropositionService () {	
 	}
 	
-    public void registerVote (String userId, String propId, int direction) {
+    public List<Integer> registerVote (String userId, String propId, int direction) {
     	Proposition prop = propositions.findBy_id(propId);
     	int votesFavor = prop.getVotesFavor();
     	int votesAgainst = prop.getVotesAgainst();
@@ -51,7 +53,7 @@ public class PropositionService {
     	Vote previousVote = votes.findByIdAndVoter(propId, userId);
     	if (previousVote != null) {
     		if (previousVote.getDirection() == direction)
-    			return;
+    			return Arrays.asList(votesFavor, votesAgainst);
     		else {
     			
     		}
@@ -89,6 +91,7 @@ public class PropositionService {
     	vote.setVoter(userId);
     	vote.setWhen(new Date());
     	votes.save(vote);
+		return Arrays.asList(votesFavor, votesAgainst);
     }
 
     public Proposition get(String propId) {
@@ -97,7 +100,7 @@ public class PropositionService {
 
     public List<Proposition> getByZip(String zip, Sort order) {
     	TypedAggregation<Proposition> agg = Aggregation.newAggregation(Proposition.class,
-    			Aggregation.project("created","creator","text","title","votesFavor","votesAgainst","votesDiff","comments")
+    			Aggregation.project("created","creator","text","title","votesFavor","votesAgainst","votesDiff","comments","tags")
     				.andExpression("votesFavor + votesAgainst").as(votesTotal)
     				.andExpression("votesFavor - votesAgainst").as(votesDiff),
     			Aggregation.sort(order)
@@ -109,7 +112,7 @@ public class PropositionService {
     	TypedAggregation<Proposition> agg = Aggregation.newAggregation(Proposition.class,
     			Aggregation.match(Criteria.where("tags").all(tags)),
     			Aggregation.project("created","creator","text","title","votesFavor","votesAgainst",
-    								"votesDiff","comments")
+    								"votesDiff","comments","tags")
     				.andExpression("votesFavor + votesAgainst").as(votesTotal)
     				.andExpression("votesFavor - votesAgainst").as(votesDiff),
     			Aggregation.sort(order)

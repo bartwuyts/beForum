@@ -9,10 +9,21 @@ $.ajaxSetup ({
     cache: false
 });
 
-function vote(id,direction) {
-    jQuery.get('/vote', 
-                {id: id, direction: direction}, 
-                function(data) { $("#votes").text(data); });
+function voteProposal(id,direction) {
+    $.ajax({
+        url: "/voteProposal/"+id+"/"+direction,
+        context: $("#votes")
+    }).done(function(data) {
+        $("#votes > #favor").text(data[0]);
+        $("#votes > #against").text(data[1]);
+        if (direction==1) {
+        	$(".voting > .favor").addClass("disabled");
+            $(".voting > .against").removeClass("disabled");
+        } else {
+            $(".voting > .against").addClass("disabled");
+            $(".voting > .favor").removeClass("disabled");
+        }
+    });
 }
 
 function voteComment(id, direction) {
@@ -24,93 +35,140 @@ function voteComment(id, direction) {
     });
 }
 </script>
-
-<div class="section group">
-  <div class="col span_2_of_3">
-    <span class="caption" th:utext="${proposition.getTitle()}">Voorstel</span><br/>
-    <span th:text="${#calendars.format(proposition.created,'dd/MM/yy')}+' ingediend door '"></span><a th:href="'/moreinfo/'+${proposition.creator.id}" th:text="${proposition.creator.firstName}+' '+${proposition.creator.lastName}">creator</a><span class="official" th:if="${proposition.creator.official}" th:text="${proposition.creator.official}">official</span>
- </div>
- <div class="col span_1_of_3">
- </div>
-</div>
-
-<div class="section group">
-  <div class="col span_2_of_3">
-    <div th:utext="${proposition.text}">Inhoud</div>
-	<form method="post">
-	 <input type="submit" name="favor" value="Voor" th:disabled="${vote gt 0}" th:class="${vote gt 0}? 'voted' : 'othervoted'"/>
-	 <input type="submit" name="against" value="Tegen" th:disabled="${vote lt 0}" th:class="${vote lt 0}? 'voted' : 'othervoted'"/>
-	 <textarea class="richinput" name="comment_text" rows="7" cols="80"></textarea>
-     <input type="submit" name="comment" value="toevoegen" />
-	</form>
-	<br/>
-	<h3>Commentaren</h3>
-	<script th:inline="javascript">
-	 function expand(id, propId) {
-		 $('#sub_'+id).toggle();
-		 $.ajax({
-			 url: "/comments/0/"+id,
-			 context: $("#subcomments_"+id)
-		 }).done(function(data) {
-			 if (data.length==0) {
-				$(this).html("Geen commentaren");
-			 }
-			 else {
-	            $(this).html("");
-	            for (var comment in data) {
+<script th:inline="javascript">
+     function expand(id, propId) {
+         $('#sub_'+id).toggle();
+         $.ajax({
+             url: "/comments/0/"+id,
+             context: $("#subcomments_"+id)
+         }).done(function(data) {
+             if (data.length==0) {
+                $(this).html("Geen commentaren");
+             }
+             else {
+                $(this).html("");
+                for (var comment in data) {
                     var created = new Date(data[comment].created);
-	            	$(this).append(
-	            		'<div class="comment">'+
-	                     '<span class="commentvotes">'+
+                    $(this).append(
+                        '<div class="comment">'+
+                         '<span class="commentvotes">'+
                          '<img class="icon" src="/favor.png" onclick="voteComment(&quot;'+data[comment]._id+'&quot;,1)"/><br/>'+
                          '<span id="comment_votes_'+data[comment]._id+'">'+(data[comment].votesFavor-data[comment].votesAgainst)+'</span><br/>'+
                          '<img class="icon" src="/against.png" onclick="voteComment(&quot;'+data[comment]._id+'&quot;,-1)"/><br/>'+
                         '</span>'+
-	            		'<div>'+data[comment].text+'</div>'+
-	            		'<div class="creator"><a href="/moreinfo/'+data[comment].creator.id+'">'+data[comment].creator.firstName+' '+data[comment].creator.lastName+'</a><span> op '+created.toLocaleString()+'</span></div>'+
-	            	    '<img class="icon" src="/expand.png" onclick="expand(&quot;'+data[comment]._id+'&quot;, &quot;'+propId+'&quot;)"/>'+
-	            	    '<span>'+data[comment].childComments+' reacties</span>'+
-	            	    '<div id="sub_'+data[comment]._id+'" class="subcomments">'+
-	            	     '<form action="/subcomment/'+propId+'/'+data[comment]._id+'" method="post">'+
-	            	      '<textarea class="richinput" name="comment_text" rows="7" cols="80"></textarea>'+
-	            	      '<input type="submit" name="comment" value="toevoegen" />'+
-	            	     '</form>'+
-	            	     '<div id="subcomments_'+data[comment]._id+'">Laden...</div>'+
-	            		'</div></div>');
-	            }
-			 }
-			 $(".richinput").sceditor({
-		            plugins:"bbcode",
-		            style:"/sceditor/minified/jquery.sceditor.default.min.css",
-		            toolbar:"bold,italic,underline,size,color,image,emoticon",
-		            emoticonsRoot:"/sceditor/"});
-		 });
-	 }
-	</script>
-	<div class="comments" th:each="comment : ${comments}">
-	 <div class="comment">
-      <span class="commentvotes">
-       <img class="icon" th:id="'comment_favor_'+${comment._id}" src="/favor.png" th:onclick="'voteComment(\''+${comment._id}+'\',1)'"/><br/>
-       <span th:id="'comment_votes_'+${comment._id}" th:text="${comment.votesFavor}-${comment.votesAgainst}">tegen</span><br/>
-       <img class="icon" th:id="'comment_against_'+${comment._id}" src="/against.png" th:onclick="'voteComment(\''+${comment._id}+'\',-1)'"/><br/>
-      </span>
-	  <div th:utext="${comment.text}">commentaar</div>
-      <div class="creator"><a th:href="'/moreinfo/'+${comment.creator.id}" th:text="${comment.creator.firstName}+' '+${comment.creator.lastName}">creator</a><span class="official" th:if="${comment.creator.official}" th:text="${comment.creator.official}">official</span><span th:text="' op '+${#calendars.format(comment.created,'dd/MM/yy hh:mm')}"></span></div>
-      <img class="icon" src="/expand.png" th:onclick="'expand(\''+${comment._id}+'\',\''+${proposition._id}+'\')'"/>
-      <span th:text="${comment.childComments}+' reacties'"></span>
-      <div th:id="'sub_'+${comment._id}" class="subcomments">
-       <form th:action="'/subcomment/'+${proposition._id}+'/'+${comment._id}" method="post">
-        <textarea class="richinput comment_textarea" name="comment_text" rows="7" cols="80"></textarea>
-	    <input type="submit" name="comment" value="toevoegen" />
-	   </form>
- 	   <div th:id="'subcomments_'+${comment._id}" >Laden...</div>
+                        '<div>'+data[comment].text+'</div>'+
+                        '<div class="creator"><a href="/moreinfo/'+data[comment].creator.id+'">'+data[comment].creator.firstName+' '+data[comment].creator.lastName+'</a><span> op '+created.toLocaleString()+'</span></div>'+
+                        '<img class="icon" src="/expand.png" onclick="expand(&quot;'+data[comment]._id+'&quot;, &quot;'+propId+'&quot;)"/>'+
+                        '<span>'+data[comment].childComments+' reacties</span>'+
+                        '<div id="sub_'+data[comment]._id+'" class="subcomments">'+
+                         '<form action="/subcomment/'+propId+'/'+data[comment]._id+'" method="post">'+
+                          '<textarea class="richinput" name="comment_text" rows="7" cols="80"></textarea>'+
+                          '<input type="submit" name="comment" value="toevoegen" />'+
+                         '</form>'+
+                         '<div id="subcomments_'+data[comment]._id+'">Laden...</div>'+
+                        '</div></div>');
+                }
+             }
+             $(".richinput").sceditor({
+                    plugins:"bbcode",
+                    style:"/sceditor/minified/jquery.sceditor.default.min.css",
+                    toolbar:"bold,italic,underline,size,color,image,emoticon",
+                    emoticonsRoot:"/sceditor/"});
+         });
+     }
+</script>
+    
+<br/>
+<br/>
+<div class="row collapse">
+  <div class="body">
+	<div class="row">
+	  <a href="/"><i class="fa fa-arrow-left fa-1x"></i> Terug naar overzicht</a>
+	</div>
+    <div class="row">
+	  <div class="row creator">
+	    <img th:src="'/photo/'+${proposition.creator.id}" class="CreatorPhoto"/><a th:href="'/moreinfo/'+${proposition.creator.id}" th:text="${proposition.creator.firstName}+' '+${proposition.creator.lastName}">creator</a>
+	    deed volgende suggestie op 
+	    <span th:text="${#calendars.format(proposition.created,'dd/MM/yyyy')}"></span>
+	    om <span th:text="${#calendars.format(proposition.created,'HH:mm')}"></span>
+	  </div>
+	</div>
+    <div class="row">
+      <div class="small-9 columns">
+	    <div class="row title">
+	      <span th:utext="${proposition.getTitle()}">Titel</span>
+	    </div>
+	    <div class="row" th:utext="${proposition.text}">
+	    </div>
+	    <br/>
+	    <div class="row comments">
+	      <div class="row title">
+	      <i class="fa fa-comments-o fa-1x"></i> Reacties (<span th:text="${proposition.comments}"></span>)
+	      </div>
+	      <div class="panel comments">
+	       <div th:each="comment : ${comments}">
+		     <div class="row comment">
+		      <div class="small-1 columns">
+		          <img th:src="'/photo/'+${comment.creator.id}" class="CreatorPhoto"/>
+		          <br/>
+			      <span class="commentvotes">
+			       <span th:id="'comment_favor_'+${comment._id}" src="/favor.png" th:onclick="'voteComment(\''+${comment._id}+'\',1)'"><i class="fa fa-thumbs-up fa-2x"></i></span>
+			      </span>
+		      </div>
+		      <div class="small-11 columns">
+		        <div class="row creator">
+                  <a th:href="'/moreinfo/'+${comment.creator.id}" th:text="${comment.creator.firstName}+' '+${comment.creator.lastName}">creator</a><span class="official" th:if="${comment.creator.official}" th:text="${comment.creator.official}">official</span><span th:text="' gaf volgende reactie op '+${#calendars.format(comment.created,'dd/MM/yyyy')}+' om '+${#calendars.format(comment.created,'hh:mm')}"></span>		        
+		        </div>
+                <div class="row">
+			      <div th:utext="${comment.text}">commentaar</div>
+                </div>
+                <div class="commentSum" th:onclick="'expand(\''+${comment._id}+'\',\''+${proposition._id}+'\')'">
+			      <i class="fa fa-comments-o fa-1x"></i>
+			      <span th:text="${comment.childComments}+' reacties'"></span>
+			    </div>
+			      <div th:id="'sub_'+${comment._id}" class="subcomments">
+			       <form th:action="'/subcomment/'+${proposition._id}+'/'+${comment._id}" method="post">
+			        <textarea class="richinput comment_textarea" name="comment_text" rows="7" cols="80"></textarea>
+			        <input type="submit" name="comment" value="toevoegen" />
+			       </form>
+			       <div th:id="'subcomments_'+${comment._id}" >Laden...</div>
+			      </div>
+		      </div>
+             </div>
+           </div>
+	    </div>
+      </div>
+      <div class="row">
+        <div class="row richinputdiv" id="tb_placeholder">
+          <input type="text" value="Voeg reactie toe" onfocus="$('#tb_placeholder').hide();$('#tb_textbox').show();
+        	  $('#comment_text').sceditor({
+                  plugins:'bbcode',
+                  style:'/sceditor/minified/jquery.sceditor.default.min.css',
+                  width:'98%',
+                  height:'98%',
+                  toolbar:'bold,italic,underline,size,color,image,emoticon',
+                  emoticonsRoot:'/sceditor/'});"/>
+        </div>
+        <div class="row richinputdiv" style="display:none" id="tb_textbox">
+          <form method="POST">
+            <textarea id="comment_text" name="comment_text"></textarea>
+            <input type="submit" name="comment" value="toevoegen" />
+          </form>
+        </div>
       </div>
      </div>
+     <div class="small-3 columns panel">
+       <div class="row icons" id="votes">
+         <span class="icon"><i class="fa fa-thumbs-up fa-1x"></i></span><span id="favor" th:text="${proposition.votesFavor}"></span>
+         <span class="icon"><i class="fa fa-thumbs-down fa-1x"></i></span><span id="against" th:text="${proposition.votesAgainst}"></span>
+       </div>
+       <br/>
+       <div class="row voting">
+         <a href="#" class="button favor text-left" th:classappend="${vote==1}?'disabled':''" th:onclick="'voteProposal(&quot;'+${proposition._id}+'&quot;,1);'"><i class="fa fa-thumbs-up fa-1x"></i> Ik stem voor</a><br/>
+         <a href="#" class="button against text-left" th:classappend="${vote==-1}?'disabled':''" th:onclick="'voteProposal(&quot;'+${proposition._id}+'&quot;,-1);'"><i class="fa fa-thumbs-down fa-1x"></i> Ik stem tegen</a>
+       </div>
+     </div>
     </div>
-  </div>
-
-  <div class="col span_1_of_3">
-    <div th:replace="fragments/header :: sidebar"></div>
   </div>
 </div>
 

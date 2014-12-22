@@ -1,7 +1,10 @@
 package be.ordina.beforum.controller;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -26,6 +29,8 @@ import be.fedict.eid.applet.service.DocumentType;
 import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.Address;
 import be.ordina.beforum.model.Comment;
+import be.ordina.beforum.model.Tag;
+import be.ordina.beforum.model.TagGroup;
 import be.ordina.beforum.model.User;
 import be.ordina.beforum.model.Vote;
 import be.ordina.beforum.services.CommentService;
@@ -50,6 +55,7 @@ public class WebController {
 	
     @RequestMapping(value="/")
     public String index(HttpSession session, Model model,
+    		@RequestParam(value="tag", required=false) String searchTag,
     		@RequestParam(value="tags", required=false) List<String>searchTags,
 			@RequestParam(value="order", required=false) String order) {
     	System.err.println("in function 'index' - start");
@@ -61,23 +67,43 @@ public class WebController {
     	}
     	System.err.println("in function 'index' - let's generate some data");
     	Sort sorting=PropositionService.sortCreated;
-    	if (order != null) {
-    		if (order.equals("time")) {
-    			sorting = PropositionService.sortCreated;
-    		} else if (order.equals("popularity")) {
-    			sorting = PropositionService.sortPopularity;
-    		} else if (order.equals("controversial")) {
-    			sorting = PropositionService.sortControversial;    		
-    		}
-    		model.addAttribute("order", order);
+    	if (order == null) {
+    		order = "time";
     	}
+		if (order.equals("time")) {
+			sorting = PropositionService.sortCreated;
+		} else if (order.equals("popularity")) {
+			sorting = PropositionService.sortPopularity;
+		} else if (order.equals("controversial")) {
+			sorting = PropositionService.sortControversial;    		
+		}
+		model.addAttribute("order", order);
     	model.addAttribute("user", currentUser);
+    	if ((searchTags==null || searchTags.size()==0) &&
+    			(searchTag!=null && !searchTag.equals(""))) {
+    		searchTags = new ArrayList<String>();
+    		searchTags.add(searchTag);
+    	}
     	if (searchTags==null || searchTags.size()==0) {
     		model.addAttribute("propositions", propositions.getByZip(currentUser.getAddress().getZip(), sorting));
     	} else {
     		model.addAttribute("propositions", propositions.getByZipAndTags(currentUser.getAddress().getZip(), searchTags, sorting));    		
+    		model.addAttribute("currentTag",searchTag);
     	}
-		model.addAttribute("tagList", tags.findAll());
+    	List<Tag> tagList = tags.findAll();
+		model.addAttribute("tagList", tagList);
+		Map<String, String> tagMap = new HashMap<String, String>();
+		for (Tag tag : tagList) {
+			tagMap.put(tag.get_id(), tag.getText());
+		}
+		model.addAttribute("tagMap", tagMap);
+		List<TagGroup> tagGroups = tags.findAllExtended();
+		Map<String, Integer> tagGroupMap = new HashMap<String, Integer>();
+		for (TagGroup tagGroup : tagGroups) {
+			tagGroupMap.put(tagGroup.get_id(), tagGroup.getCount());
+		}
+
+		model.addAttribute("tagGroupMap", tagGroupMap);
     	System.err.println("in function 'index' - go to home page");
     	return "home";
     }
@@ -93,7 +119,7 @@ public class WebController {
     		@RequestParam(value="tags", required=false) List<String>searchTags) {
     	Identity id = (Identity)session.getAttribute("eid.identity");
     	if (id==null) {
-    		return index(session, model, null, null);
+    		return index(session, model, null, null, null);
     	}
     	if ((id.getDocumentType()!=DocumentType.BELGIAN_CITIZEN && id.getDocumentType()!=DocumentType.KIDS_CARD) ||
     			id.getCardValidityDateBegin().after(LocalDate.now()) ||
@@ -114,7 +140,7 @@ public class WebController {
     		@PathVariable("userId") String userId) {
     	Object auth=session.getAttribute("authenticated_id");
     	if (auth==null)
-    		return index(session, model, null, null);
+    		return index(session, model, null, null, null);
     	User user = users.findUser(userId);
 		model.addAttribute("author", user);
 		model.addAttribute("user", currentUser);
@@ -136,7 +162,7 @@ public class WebController {
     public String addProposition(HttpSession session, Model model) {
     	Object auth=session.getAttribute("authenticated_id");
     	if (auth==null)
-    		return index(session, model, null, null);
+    		return index(session, model, null, null, null);
 		model.addAttribute("user", currentUser);
 		model.addAttribute("tagList", tags.findAll());
     	return "addproposition";
@@ -162,7 +188,7 @@ public class WebController {
     		@PathVariable("propId") String propId) {
     	Object auth=session.getAttribute("authenticated_id");
     	if (auth==null)
-    		return index(session, model, null, null);
+    		return index(session, model, null, null, null);
 		model.addAttribute("user", currentUser);
     	model.addAttribute("proposition", propositions.get(propId));
     	Vote vote = propositions.getVote(propId, (String)auth);
@@ -197,7 +223,19 @@ public class WebController {
     	int result = comments.registerVote ((String)session.getAttribute("authenticated_id"), id, direction);
     	return new ResponseEntity<Integer>(new Integer(result), responseHeaders, HttpStatus.OK);
     }
-    
+
+    @RequestMapping(value="/voteProposal/{id}/{direction}",method=RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<List<Integer>> voteProposal(HttpSession session, Model model,
+    		@PathVariable("id") String id,
+    		@PathVariable("direction") int direction) {
+    	HttpHeaders responseHeaders = new HttpHeaders();
+    	responseHeaders.setContentType(MediaType.APPLICATION_JSON);
+    	responseHeaders.set("Content-Disposition", "attachment");
+    	List<Integer> result = propositions.registerVote ((String)session.getAttribute("authenticated_id"), id, direction);
+    	return new ResponseEntity<List<Integer>>(result, responseHeaders, HttpStatus.OK);
+    }
+
     @RequestMapping(value="/proposition/{propId}",method=RequestMethod.POST, params="favor")
     public String voteFavor(HttpSession session, Model model,
     			@PathVariable("propId") String propId) {

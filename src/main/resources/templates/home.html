@@ -2,60 +2,146 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="fragments/header :: head"></head>
 <body>
+
+<script type="text/javascript">
+//<![CDATA[
+  function addGetParameter (paramName, paramValue) {
+	var url = window.location.href;
+	if (url.indexOf(paramName + "=") >= 0)
+	{
+	    var prefix = url.substring(0, url.indexOf(paramName));
+	    var suffix = url.substring(url.indexOf(paramName));
+	    suffix = suffix.substring(suffix.indexOf("=") + 1);
+	    suffix = (suffix.indexOf("&") >= 0) ? suffix.substring(suffix.indexOf("&")) : "";
+	    url = prefix + paramName + "=" + paramValue + suffix;
+	}
+	else
+	{
+	if (url.indexOf("?") < 0)
+	    url += "?" + paramName + "=" + paramValue;
+	else
+	    url += "&" + paramName + "=" + paramValue;
+	}
+	window.location.href = url;
+  }
+  
+  function setOrder (order) {
+    addGetParameter ("order", order);
+  }
+//]]>
+</script>
+
 <div th:replace="fragments/header :: header"></div>
 
-<div class="section group">
-  <div class="col span_2_of_3">
-   <span class="caption" th:text="'Voorstellen '+${user.mainCity}">Voorstellen gemeente</span>
-   <form class="order" method="GET">
-    <span class="order">
-     Toon eerst 
-     <select name="order" onchange="this.form.submit()">
-      <option value="time">recentste</option>
-      <option value="popularity" th:selected="${order=='popularity'}">populairste</option>
-      <option value="controversial" th:selected="${order=='controversial'}">opvallendste</option>
-     </select>
-    </span>
-   </form>
-   <form method="GET">
-     <input id="search_tags" name="tags" type="hidden"></input>
-     <script th:inline="javascript">
-       $("#search_tags").select2({
-         placeholder: "Zoek tags",
-         allowClear: true,
-         multiple: true,
-         data: [[${tagList}]]
-       });
-     </script>
-     <input type="submit" value="zoeken"/>
-    </form>
- </div>
- <div class="col span_1_of_3">
-  <a href="addproposition">nieuw voorstel</a>  
- </div>
-</div>
-
-<div class="section group">
-  <div class="col span_2_of_3">
-	<div class="propositions" th:each="prop : ${propositions}">
-	 <div class="proposition">
-	  <span class="votes">
-	   <span th:id="'votes'" th:text="${prop.votesFavor}+' voor'">voor</span><br/>
-       <span th:id="'votes'" th:text="${prop.votesAgainst}+' tegen'">tegen</span><br/>
-       <span th:text="${prop.comments}+' reacties'"></span><br/>
-      </span>
-      <span class="proptitle">
-	   <a th:href="'/proposition/'+${prop._id}"><span th:utext="${prop.getTitle()}">Titel</span></a><br/>
-	   <div class="creator"><span th:text="${#calendars.format(prop.created,'dd/MM/yy')}+' ingediend door '"></span><a th:href="'/moreinfo/'+${prop.creator.id}" th:text="${prop.creator.firstName}+' '+${prop.creator.lastName}">creator</a><span class="official" th:if="${prop.creator.official}" th:text="${prop.creator.official}">official</span></div>
-	  </span>
-	 </div>
-	 <br/>
-	</div>
+  <div class="row">
+    <dl class="tabs" data-tab="">
+     <dd class="active"><a href="#panel1">HOME</a></dd>
+     <dd><a href="#panel2">ALLE SUGGESTIES</a></dd>
+     <dd><a href="#panel3">CATEGORIEËN</a></dd>
+     <dd><a href="#panel4">ACTIEVE PROJECTEN</a></dd>
+     <dd><a href="#panel5">HOE WERKT HET?</a></dd>
+    </dl>
+    <div class="tabs-content">
+     <div class="content active" id="panel1">
+      <div class="body">
+       <div class="row collapse title">Suggesties</div>
+       <div class="row collapse">
+        <form name="opties">
+         <div class="small-3 columns">
+          <select onchange="location = '/?tag='+this.options[this.selectedIndex].value">
+           <option value="">Alles</option>
+           <option th:each="tag : ${tagList}" th:text="${tag.text}" th:value="${tag._id}" th:selected="${tag._id.equals(currentTag)}" />
+          </select>
+         </div>
+         <div class="small-6 columns"></div>
+         <div class="small-3 columns">
+          <select onchange="setOrder(this.options[this.selectedIndex].value)">
+           <option value="time">Recent</option>
+           <option value="popularity" th:selected="${order.equals('popularity')}">Populair</option>
+           <option value="controversial" th:selected="${order.equals('controversial')}">Opvallend</option>
+           <option value="4">Op Agenda</option>
+           <option value="5">Geweigerd</option>
+           <option value="6">Gepland</option>
+           <option value="7">In Uitvoering</option>
+           <option value="8">Uitgevoerd</option>
+          </select>
+         </div>
+        </form>
+        <div class="small-3 columns">
+        </div>
+       </div>
+	   <div class="row collapse" th:each="prop : ${propositions}">
+	     <div class="panel proposition">
+	      <div class="row">
+	      <img th:src="'/photo/'+${prop.creator.id}" class="CreatorPhoto"/>
+          <div class="small-11 columns">
+	       <div class="row creator">
+	        <a th:href="'/moreinfo/'+${prop.creator.id}" th:text="${prop.creator.firstName}+' '+${prop.creator.lastName}">creator</a>
+	        deed volgende suggestie op 
+	        <span th:text="${#calendars.format(prop.created,'dd/MM/yyyy')}"></span>
+	        om <span th:text="${#calendars.format(prop.created,'HH:mm')}"></span>
+	        <span class="icons">
+	         <span class="icon"><i class="fa fa-comments-o fa-1x"></i></span><span th:text="${prop.comments}"></span>
+             <span class="icon"><i class="fa fa-thumbs-o-up fa-1x"></i></span><span th:text="${prop.votesFavor}"></span>
+             <span class="icon"><i class="fa fa-thumbs-o-down fa-1x"></i></span><span th:text="${prop.votesAgainst}"></span>
+	        </span>
+           </div>
+           <div class="row title">
+	       <a th:href="'/proposition/'+${prop._id}"><span th:utext="${prop.getTitle()}">Titel</span></a><br/>
+           </div>
+           <div class="row summary" th:utext="${prop.text}">
+           </div>
+           <br/>
+           <div class="row tags">
+             <a th:each="tag : ${prop.tags}" th:href="'/?tag='+${tag}" th:utext="'&lt;i class=&quot;fa fa-tag fa1x&quot;&gt;&lt;/i&gt;'+${tagMap.get(tag)} ">1 tag</a>
+             <a th:href="'/proposition/'+${prop._id}" class="button right">Lees meer</a>
+           </div>
+          </div>
+          </div>
+	     </div>
+	   </div>
+	  </div>
+     </div>
+     <div class="content" id="panel2">
+      <div class="body">
+       <p>This is the second panel of the basic tab example. This is the second panel of the basic tab example.</p>
+      </div>
+     </div>
+     <div class="content" id="panel3">
+      <div class="body">
+       <div class="row collapse title">
+         Categorieen
+       </div>
+       <div class="row collapse">
+         <ul class="small-block-grid-3">
+           <li th:each="tag : ${tagMap}">
+             <div class="row">
+                <a th:href="'/?tag='+${tag.key}" th:text="${tag.value}">tag</a>
+             </div>
+             <div class="row">
+                <span th:text="${tagGroupMap.get(tag.key)}? ${tagGroupMap.get(tag.key)}+' ideeen' : 'geen ideeen'">aantal ideeen</span>
+             </div>
+           </li>
+         </ul>
+       </div>
+      </div>
+     </div>
+     <div class="content" id="panel4">
+      <div class="body">
+       <p>This is the fourth panel of the basic tab example. This is the fourth panel of the basic tab example.</p>
+      </div>
+     </div>
+     <div class="content" id="panel5">
+      <div class="body">
+       <p>Hier komt dan de uitleg van hoe alles precies werkt.</p>
+       <p>Uiteraard stel ik dat nog even uit... :)</p>
+      </div>
+     </div>
+    </div>
   </div>
-
-  <div class="col span_1_of_3">
-    <div th:replace="fragments/header :: sidebar"></div>
-  </div>
-</div>
+  
+  <script>
+  $(document).foundation();
+  </script>
 </body>
 </html>

@@ -5,53 +5,56 @@
 <body>
 <div th:replace="fragments/header :: header"></div>
 
-<span class="caption" th:text="'Nieuw voorstel '+${user.mainCity}">Nieuw voorstel</span>
-
-<div class="section group">
-  <div class="col span_2_of_3">
-	<form method="POST">
-	<div>
-	<span>Titel</span>
-	<div>
-	<input id="add_title" type="text" name="title"/>
-	</div>
-	</div>
-	<div>
-	<span>Beschrijving</span>
-	<div>
-	<textarea class="richinput" name="text" maxlength="1000" cols="80" rows="10"></textarea>
-	</div>
-	</div>
-	<div>
-    <span>Tags</span>
-    <div>
-     <input id="add_tags" name="tags" type="hidden"></input>
-     <script th:inline="javascript">
-       $("#add_tags").select2({
-         placeholder: "Kies tags",
-         allowClear: true,
-         multiple: true,
-         //Allow manually entered text in drop down. 
-         createSearchChoice:function(term, data) { 
-           if ( $(data).filter( function() { 
-             return this.text.localeCompare(term)===0; 
-           }).length===0) { 
-             return {id:'+'+term, text:term}; 
-           } 
-         }, 
-         data: [[${tagList}]]
-       });
-     </script>
-    </div>
-    </div>
-    <br/>
-	<input type="submit" value="indienen"/>
-	</form>
-  </div>
-
-  <div class="col span_1_of_3">
-    <div th:replace="fragments/header :: sidebar"></div>
+<br/>
+<br/>
+<div class="row collapse">
+  <div class="body">
+    <div class="row">
+        <span class="caption" th:text="'Nieuw voorstel '+${user.mainCity}">Nieuw voorstel</span>
+        <div class="row">
+		  <form method="POST">
+			<div class="row">
+		  	  <span>Titel</span>
+			  <div class="row">
+			    <input id="add_title" type="text" name="title"/>
+			  </div>
+			</div>
+			<div class="row">
+			  <span>Beschrijving</span>
+			  <div class="row">
+			    <textarea class="richinput" name="text" maxlength="1000" cols="80" rows="10"></textarea>
+			  </div>
+			</div>
+			<div class="row">
+		      <span>Tags</span>
+		      <div class="row">
+		        <input id="add_tags" name="tags" type="hidden"></input>
+		        <script th:inline="javascript">
+		         $("#add_tags").select2({
+		         placeholder: "Kies tags",
+		         allowClear: true,
+		         multiple: true,
+		         //Allow manually entered text in drop down. 
+		         createSearchChoice:function(term, data) { 
+		           if ( $(data).filter( function() { 
+		             return this.text.localeCompare(term)===0; 
+		           }).length===0) { 
+		             return {id:'+'+term, text:term}; 
+		           } 
+		         }, 
+		         data: [[${tagList}]]
+		         });
+		        </script>
+		      </div>
+		    </div>
+		    <div class="row">
+			  <input type="submit" value="indienen"/>
+			</div>
+		  </form>
+		</div>
+     </div>
   </div>
 </div>
+
 </body>
 </html>

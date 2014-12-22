@@ -1,12 +1,90 @@
-body {
-	margin-left : 2em;
-    margin-right : 2em;
+.header {
+	margin-top: 1em;
+    margin-bottom : 1em;
 }
 
-.title {
-	font-size : 100px;
-	color : black;
+.body {
+	padding : 1em;
+	color : #343434;
+	background-color : white;
+}
+.body .title {
+    font-size: 1.7em;
+    font-weight: 200;
+}
+
+.dropdown {
+	background-color : transparent;
+}
+.dropdown:hover {
+    background-color : transparent;
+}
+
+.headershare {
+    font-family : Helvetica, Arial, sans-serif;
+    background-color : #00ccff;
+    opacity : 0.5;
+    padding : 1em;
+}
+.headershare .title {
+	font-size : 2em;
+    opacity : 1;
+	color : white;
+    margin-right : 0.5em;
+}
+.headershare .sharebutton {
+    opacity : 1;
+    background-color : #0099ff;
+    padding-left : 1em;
+    padding-right : 1em;
+    padding-top : 0.5em;
+    padding-bottom : 0.5em;
+    margin-right : 1em;
+}
+.headershare .sharebutton a:link {
 	text-decoration : none;
+    color : white;
+}
+.headershare .sharebutton a:visited {
+    text-decoration : none;
+	color : white;
+}
+.headershare .sharebutton a:hover {
+    text-decoration : none;
+    color : white;
+}
+.headershare .sharebutton a:active {
+    text-decoration : none;
+    color : white;
+}
+
+.row {
+	min-width:100% !important;
+}
+.tabs {
+	margin-top : 6em;
+}
+.tabs dd > a, .tabs .tab-title > a {
+    background-color : #0099ff;
+	color : white;
+}
+.tabs dd.active a, .tabs .tab-title.active a {
+    background-color : white;
+    color : #0099ff;
+}
+.tabs dd > a:hover, .tabs .tab-title > a:hover {
+    background-color: #00ccff; 
+}
+.tabs dd.active > a:hover, .tabs .tab-title.active > a:hover {
+    background-color: white; 
+}
+.tabs-content {
+    background-color : white;
+}
+
+.main {
+	background-color : white;
+    padding : 1em;
 }
 
 .communityFlag {
@@ -30,23 +108,61 @@ body {
     margin-left : 5em;
 }
 
-.sidebar {
-    -moz-border-radius: 10px;
-    -webkit-border-radius: 10px;
-    border-radius: 10px;
-    border: 1px solid;
-    
-    padding-top: 1em;
-    padding-bottom: 1em;
-    padding-left: 1em;
-    padding-right: 1em;
-    background-color : LightGray;
+.proposition {
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+	background-color : #F9F9F9;
+}
+.creator{
+	font-size : 0.75em;
+	color : #858585;
+}
+.creator > a {
+	color : #858585;
+}
+.proposition .icons {
+	float : right;
+}
+.proposition .title{
+    font-size : 1.5em;
+}
+.proposition .summary{
+    height : 4em;
+    min-height : 4em;
+    overflow : hidden;
+}
+.proposition .button{
+	height : 2em;
+	line-height : 0.25em;
 }
 
-.proposition {
-    font-size : 1.5em;
-    clear : both;
-    margin-top : 1.5em;
+.comments .title{
+	font-size : 1.2em;
+	font-weight : 500;
+}
+.commentSum{
+    font-size : 0.75em;
+    margin-top : 0.75em;
+    color : #858585;
+}
+
+.icons {
+	color : #858585;
+}
+.icons .icon {
+	margin-left : 2em;
+	margin-right : 0.5em;
+}
+
+.voting .button {
+	width : 100%;
+}
+.voting .favor {
+	background-color : #2EB82E;
+}
+.voting .against {
+	background-color : #FF1919;
 }
 
 .votes {
@@ -65,15 +181,8 @@ body {
     font-size : 0.9em;
     float : left;
     margin-right : 1em;
-}
-
-.proptitle {
-	float : left;
-    line-height : 0.85em;
-}
-
-.creator {
-    font-size : 0.65em;
+    margin-top : 0.5em;
+    color : #858585;
 }
 
 .voted {
@@ -83,18 +192,14 @@ body {
 }
 
 .comment {
-    -moz-border-radius: 10px;
-    -webkit-border-radius: 10px;
-    border-radius: 10px;
-    border: 1px solid;
     padding-top: 1em;
     padding-bottom: 1em;
     padding-left: 1em;
     padding-right: 1em;    
 }
 
-.richinput {
-	width: 50em;
+.richinputdiv {
+	width: 100%;
 	height: 7em;
 }
 
@@ -113,7 +218,17 @@ body {
     width: 40em;
 }
 
-
 .IdPhoto {
     float : right;
+    width : 1.5em;
+    height : 1.5em;
+    border-radius : 50%;
+    overflow : hidden;
+}
+.CreatorPhoto {
+    width : 1.5em;
+    height : 1.5em;
+    border-radius : 50%;
+    overflow : hidden;
+    float : left;
 }
