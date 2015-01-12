@@ -22,8 +22,7 @@
 
 .headershare {
     font-family : Helvetica, Arial, sans-serif;
-    background-color : #00ccff;
-    opacity : 0.5;
+    background-color : rgba(0,204,255, 0.5);
     padding : 1em;
 }
 .headershare .title {
@@ -33,7 +32,6 @@
     margin-right : 0.5em;
 }
 .headershare .sharebutton {
-    opacity : 1;
     background-color : #0099ff;
     padding-left : 1em;
     padding-right : 1em;
@@ -113,6 +111,7 @@
     -webkit-border-radius: 2px;
     border-radius: 2px;
 	background-color : #F9F9F9;
+	padding-bottom: 0em;
 }
 .creator{
 	font-size : 0.75em;
@@ -128,13 +127,48 @@
     font-size : 1.5em;
 }
 .proposition .summary{
-    height : 4em;
-    min-height : 4em;
+	font-size : 1em;
+    height : 4.5em;
+    min-height : 4.5em;
     overflow : hidden;
 }
 .proposition .button{
 	height : 2em;
 	line-height : 0.25em;
+}
+.proposition .status {
+    padding-top : 0.5em;
+}
+.proposition .tags {
+	padding-top : 1em;
+}
+.proposition .tags .tag {
+    padding-right : 1em;
+}
+.proposition .status {
+    color : #858585;
+}
+
+.progress{
+    padding-bottom : 0em;
+    margin-bottom : 0em;
+    height : 0.5em;
+    max-height : 0.5em;
+}
+.progressText{
+    font-size : 0.75em;
+    color : #858585;
+    padding-top : 0em;
+    margin-top : 0em;
+}
+
+.category {
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    background-color : #F9F9F9;
+    padding : 1em;
+    margin : 1em;
 }
 
 .comments .title{
@@ -178,11 +212,11 @@
 }
 
 .commentvotes {
-    font-size : 0.9em;
-    float : left;
-    margin-right : 1em;
-    margin-top : 0.5em;
-    color : #858585;
+    margin-left : 8em;
+}
+
+.commentvotes .voteIcon {
+	margin-right : 1em;
 }
 
 .voted {
@@ -196,6 +230,14 @@
     padding-bottom: 1em;
     padding-left: 1em;
     padding-right: 1em;    
+}
+
+.commentSum {
+    visibility: hidden;   
+}
+
+.comment:hover .commentSum {
+	visibility: visible;
 }
 
 .richinputdiv {

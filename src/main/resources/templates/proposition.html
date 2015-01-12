@@ -50,23 +50,34 @@ function voteComment(id, direction) {
                 for (var comment in data) {
                     var created = new Date(data[comment].created);
                     $(this).append(
-                        '<div class="comment">'+
-                         '<span class="commentvotes">'+
-                         '<img class="icon" src="/favor.png" onclick="voteComment(&quot;'+data[comment]._id+'&quot;,1)"/><br/>'+
-                         '<span id="comment_votes_'+data[comment]._id+'">'+(data[comment].votesFavor-data[comment].votesAgainst)+'</span><br/>'+
-                         '<img class="icon" src="/against.png" onclick="voteComment(&quot;'+data[comment]._id+'&quot;,-1)"/><br/>'+
-                        '</span>'+
-                        '<div>'+data[comment].text+'</div>'+
-                        '<div class="creator"><a href="/moreinfo/'+data[comment].creator.id+'">'+data[comment].creator.firstName+' '+data[comment].creator.lastName+'</a><span> op '+created.toLocaleString()+'</span></div>'+
-                        '<img class="icon" src="/expand.png" onclick="expand(&quot;'+data[comment]._id+'&quot;, &quot;'+propId+'&quot;)"/>'+
-                        '<span>'+data[comment].childComments+' reacties</span>'+
-                        '<div id="sub_'+data[comment]._id+'" class="subcomments">'+
-                         '<form action="/subcomment/'+propId+'/'+data[comment]._id+'" method="post">'+
-                          '<textarea class="richinput" name="comment_text" rows="7" cols="80"></textarea>'+
-                          '<input type="submit" name="comment" value="toevoegen" />'+
-                         '</form>'+
-                         '<div id="subcomments_'+data[comment]._id+'">Laden...</div>'+
-                        '</div></div>');
+                    		'<div class="row comment">'+
+                            ' <div class="small-1 columns">'+
+                            '    <img src="/photo/'+data[comment].creator.id+'" class="CreatorPhoto"/>'+
+                            '    <br/>'+
+                            '    <span class="commentvotes">'+
+                            '     <span id="comment_favor_'+data[comment]._id+'" src="/favor.png" onclick="voteComment(\''+data[comment]._id+'\',1)\'"><i class="fa fa-thumbs-up fa-2x"></i></span>'+
+                            '    </span>'+
+                            ' </div>'+
+                            ' <div class="small-11 columns">'+
+                            '  <div class="row creator">'+
+                            '    <a href="/moreinfo/'+data[comment].creator.id+'">'+data[comment].creator.firstName+' '+data[comment].creator.lastName+'</a><span> gaf volgende reactie</span>'+             
+                            '  </div>'+
+                            '  <div class="row">'+
+                            '    <div>'+data[comment].text+'</div>'+
+                            '  </div>'+
+                            '  <div class="commentSum" onclick="expand(\''+data[comment]._id+'\',\''+propId+'\')">'+
+                            '    <i class="fa fa-comments-o fa-1x"></i>'+
+                            '    <span>'+data[comment].childComments+' reacties</span>'+
+                            '  </div>'+
+                            '    <div id="sub_'+data[comment]._id+'" class="subcomments">'+
+                            '     <form action="/subcomment/'+propId+'/'+data[comment]._id+'" method="post">'+
+                            '      <textarea class="richinput comment_textarea" name="comment_text" rows="7" cols="80"></textarea>'+
+                            '      <input type="submit" name="comment" value="toevoegen" />'+
+                            '     </form>'+
+                            '     <div id="subcomments_'+data[comment]._id+'" >Laden...</div>'+
+                            '    </div>'+
+                            ' </div>'+
+                            '</div>');	
                 }
              }
              $(".richinput").sceditor({
@@ -103,36 +114,45 @@ function voteComment(id, direction) {
 	    <br/>
 	    <div class="row comments">
 	      <div class="row title">
-	      <i class="fa fa-comments-o fa-1x"></i> Reacties (<span th:text="${proposition.comments}"></span>)
+	      <i class="fa fa-comments-o fa-1x"></i><span th:text="${proposition.comments}"></span> reacties
+	      <a class="button split right tiny">Idee delen<span data-dropdown="social"></span></a>
+	      <ul id="social" class="f-dropdown" data-dropdown-content="data-dropdown-content">
+	       <li><a href="#">Facebook</a></li>
+           <li><a href="#">Twitter</a></li>
+	      </ul>
 	      </div>
 	      <div class="panel comments">
 	       <div th:each="comment : ${comments}">
 		     <div class="row comment">
 		      <div class="small-1 columns">
 		          <img th:src="'/photo/'+${comment.creator.id}" class="CreatorPhoto"/>
-		          <br/>
-			      <span class="commentvotes">
-			       <span th:id="'comment_favor_'+${comment._id}" src="/favor.png" th:onclick="'voteComment(\''+${comment._id}+'\',1)'"><i class="fa fa-thumbs-up fa-2x"></i></span>
-			      </span>
 		      </div>
 		      <div class="small-11 columns">
 		        <div class="row creator">
-                  <a th:href="'/moreinfo/'+${comment.creator.id}" th:text="${comment.creator.firstName}+' '+${comment.creator.lastName}">creator</a><span class="official" th:if="${comment.creator.official}" th:text="${comment.creator.official}">official</span><span th:text="' gaf volgende reactie op '+${#calendars.format(comment.created,'dd/MM/yyyy')}+' om '+${#calendars.format(comment.created,'hh:mm')}"></span>		        
+                  <a th:href="'/moreinfo/'+${comment.creator.id}" th:text="${comment.creator.firstName}+' '+${comment.creator.lastName}">creator</a><span class="official" th:if="${comment.creator.official}" th:text="${comment.creator.official}">official</span><span th:text="' gaf volgende reactie op '+${#calendars.format(comment.created,'dd/MM/yyyy')}+' om '+${#calendars.format(comment.created,'hh:mm')}"></span>
+                  <span class="icons">
+                  <span class="icon"><i class="fa fa-comments-o fa-1x"></i></span>
+                  <span th:text="${comment.childComments}+' reacties'"></span>
+                  </span>                  		        
 		        </div>
                 <div class="row">
 			      <div th:utext="${comment.text}">commentaar</div>
                 </div>
-                <div class="commentSum" th:onclick="'expand(\''+${comment._id}+'\',\''+${proposition._id}+'\')'">
-			      <i class="fa fa-comments-o fa-1x"></i>
-			      <span th:text="${comment.childComments}+' reacties'"></span>
+                <div class="commentSum">
+			      <a th:onclick="'expand(\''+${comment._id}+'\',\''+${proposition._id}+'\')'">Toon reacties</a>
+                  <span class="commentvotes">
+                   <a class="voteIcon" th:id="'comment_favor_'+${comment._id}" th:onclick="'voteComment(\''+${comment._id}+'\',1)'"><i class="fa fa-thumbs-up fa-1x"></i></a>
+                   <a class="voteIcon" th:id="'comment_favor_'+${comment._id}" th:onclick="'voteComment(\''+${comment._id}+'\',-1)'"><i class="fa fa-thumbs-down fa-1x"></i></a>
+                  </span>
+                  
 			    </div>
-			      <div th:id="'sub_'+${comment._id}" class="subcomments">
+     	        <div th:id="'sub_'+${comment._id}" class="subcomments">
 			       <form th:action="'/subcomment/'+${proposition._id}+'/'+${comment._id}" method="post">
 			        <textarea class="richinput comment_textarea" name="comment_text" rows="7" cols="80"></textarea>
 			        <input type="submit" name="comment" value="toevoegen" />
 			       </form>
 			       <div th:id="'subcomments_'+${comment._id}" >Laden...</div>
-			      </div>
+			    </div>
 		      </div>
              </div>
            </div>

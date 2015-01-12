@@ -35,36 +35,52 @@
 
   <div class="row">
     <dl class="tabs" data-tab="">
-     <dd class="active"><a href="#panel1">HOME</a></dd>
-     <dd><a href="#panel2">ALLE SUGGESTIES</a></dd>
-     <dd><a href="#panel3">CATEGORIE�N</a></dd>
-     <dd><a href="#panel4">ACTIEVE PROJECTEN</a></dd>
+     <dd class="active"><a href="#panel1">IDEEËN</a></dd>
+     <dd><a href="#panel3">CATEGORIEËN</a></dd>
+     <dd><a href="#panel4">CROWDFUNDING</a></dd>
      <dd><a href="#panel5">HOE WERKT HET?</a></dd>
     </dl>
     <div class="tabs-content">
      <div class="content active" id="panel1">
       <div class="body">
-       <div class="row collapse title">Suggesties</div>
        <div class="row collapse">
         <form name="opties">
-         <div class="small-3 columns">
-          <select onchange="location = '/?tag='+this.options[this.selectedIndex].value">
-           <option value="">Alles</option>
-           <option th:each="tag : ${tagList}" th:text="${tag.text}" th:value="${tag._id}" th:selected="${tag._id.equals(currentTag)}" />
-          </select>
+         <div class="small-4 columns">
+          <div class="small-4 columns">
+           <label for="select_filter" class="inline">Toon me</label>
+          </div>
+          <div class="small-8 columns">
+           <select id="select_filter" onchange="location = '/?tag='+this.options[this.selectedIndex].value">
+            <option value="">alle</option>
+            <option value="">op agenda</option>
+            <option value="">geplande</option>
+            <option value="">uitgevoerde</option>
+            <option value="">geweigerde</option>
+           </select>
+          </div>
+         </div>         
+         <div class="small-4 columns">
+          <div class="small-4 columns">
+           <label for="select_category" class="inline">idee&euml;n over</label>
+          </div>
+          <div class="small-8 columns">
+           <select id="select_category" onchange="location = '/?tag='+this.options[this.selectedIndex].value">
+            <option value="">alles</option>
+            <option th:each="tag : ${tagList}" th:text="${tag.text}" th:value="${tag._id}" th:selected="${tag._id.equals(currentTag)}" />
+           </select>
+          </div>
          </div>
-         <div class="small-6 columns"></div>
-         <div class="small-3 columns">
-          <select onchange="setOrder(this.options[this.selectedIndex].value)">
-           <option value="time">Recent</option>
-           <option value="popularity" th:selected="${order.equals('popularity')}">Populair</option>
-           <option value="controversial" th:selected="${order.equals('controversial')}">Opvallend</option>
-           <option value="4">Op Agenda</option>
-           <option value="5">Geweigerd</option>
-           <option value="6">Gepland</option>
-           <option value="7">In Uitvoering</option>
-           <option value="8">Uitgevoerd</option>
-          </select>
+         <div class="small-4 columns">
+          <div class="small-4 columns">
+           <label for="select_category" class="inline">gesorteerd op</label>
+          </div>
+          <div class="small-8 columns">          
+           <select onchange="setOrder(this.options[this.selectedIndex].value)">
+            <option value="time">datum</option>
+            <option value="popularity" th:selected="${order.equals('popularity')}">populariteit</option>
+            <option value="controversial" th:selected="${order.equals('controversial')}">aandacht</option>
+           </select>
+          </div>
          </div>
         </form>
         <div class="small-3 columns">
@@ -91,9 +107,16 @@
            </div>
            <div class="row summary" th:utext="${prop.text}">
            </div>
-           <br/>
+           <div class="row status" th:if="${prop.votesFavor} - ${prop.votesAgainst} &lt; 5">
+           <div class="progress">
+             <span class="meter" th:style="'width: '+((${prop.votesFavor} - ${prop.votesAgainst})*100/5)+'%'"></span>
+           </div>
+           <span class="progressText">
+           Nog <span th:text="5 - (${prop.votesFavor} - ${prop.votesAgainst})"></span> voorstanders nodig om het op de gemeenteraad te brengen
+           </span>
+           </div>
            <div class="row tags">
-             <a th:each="tag : ${prop.tags}" th:href="'/?tag='+${tag}" th:utext="'&lt;i class=&quot;fa fa-tag fa1x&quot;&gt;&lt;/i&gt;'+${tagMap.get(tag)} ">1 tag</a>
+             <a class="tag" th:each="tag : ${prop.tags}" th:href="'/?tag='+${tag}" th:utext="'&lt;i class=&quot;fa fa-tag fa1x&quot;&gt;&lt;/i&gt; '+${tagMap.get(tag)}">1 tag</a>
              <a th:href="'/proposition/'+${prop._id}" class="button right">Lees meer</a>
            </div>
           </div>
@@ -115,12 +138,19 @@
        <div class="row collapse">
          <ul class="small-block-grid-3">
            <li th:each="tag : ${tagMap}">
-             <div class="row">
-                <a th:href="'/?tag='+${tag.key}" th:text="${tag.value}">tag</a>
+            <div class="row category">
+             <div class="small-3 columns">
+                <img src="/sceditor/emoticons/alien.png" width="100%" height="100%"/>
              </div>
-             <div class="row">
-                <span th:text="${tagGroupMap.get(tag.key)}? ${tagGroupMap.get(tag.key)}+' ideeen' : 'geen ideeen'">aantal ideeen</span>
+             <div class="small-9 columns">
+              <div class="row">
+                <span th:text="${tag.value}">tag</span>
+              </div>
+              <div class="row">
+                <a th:href="'/?tag='+${tag.key}" th:text="${tagGroupMap.get(tag.key)}? ${tagGroupMap.get(tag.key)}+' idee&euml;n' : 'geen idee&euml;n'">aantal ideeen</a>
+              </div>
              </div>
+            </div>
            </li>
          </ul>
        </div>
