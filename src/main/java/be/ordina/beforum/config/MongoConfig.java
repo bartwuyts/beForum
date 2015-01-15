@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
 
 @Configuration
 @EnableMongoRepositories
@@ -18,7 +19,7 @@ public class MongoConfig extends AbstractMongoConfiguration {
 
 	    @Override
 	    public Mongo mongo() throws Exception {
-	      return new MongoClient();
+	      return new MongoClient(new MongoClientURI("mongodb://beforum:beforum@ds031329.mongolab.com:31329/beforum"));
 	    }
 
 
