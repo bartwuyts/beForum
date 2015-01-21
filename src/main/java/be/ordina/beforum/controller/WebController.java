@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;
@@ -112,16 +115,18 @@ public class WebController {
     }
 
     @RequestMapping(value="/login")
-    public String login(HttpSession session, Model model,
+    public String login(HttpServletRequest currentRequest, HttpSession session, Model model,
     		@RequestParam(value="identified", required=false) String identified,
     		@RequestParam(value="logout", required=false) String logout) {
-
+    	
     	if (logout != null)
     		return "redirect:/";
     	
     	if (identified == null)
         	return "login";
 
+    	SavedRequest savedRequest = 
+    		    new HttpSessionRequestCache().getRequest(currentRequest, null);
     	
     	Identity id = (Identity)session.getAttribute("eid.identity");
     	if (id==null) {
@@ -139,7 +144,7 @@ public class WebController {
     	User user = users.logUser(id, address, photo);
     	Authentication authentication = new PreAuthenticatedAuthenticationToken(user, null, null);
     	SecurityContextHolder.getContext().setAuthentication(authentication);
-    	return "redirect:/";
+    	return "redirect:"+savedRequest.getRedirectUrl();
     }   
 
     @RequestMapping(value="/moreinfo/{userId}")
