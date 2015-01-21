@@ -39,7 +39,7 @@ function voteComment(id, direction) {
      function expand(id, propId) {
          $('#sub_'+id).toggle();
          $.ajax({
-             url: "/comments/0/"+id,
+             url: "/comments/"+id,
              context: $("#subcomments_"+id)
          }).done(function(data) {
              if (data.length==0) {

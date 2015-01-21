@@ -39,7 +39,7 @@
   <div class="row header">
    <div class="small-11 columns">
    </div>
-   <div th:if="${user}" class="small-1 columns">
+   <div sec:authorize="isAuthenticated()"  class="small-1 columns">
     <button href="#" data-dropdown="drop1" aria-controls="drop1" aria-expanded="false" class="button dropdown">
      <img th:src="'/photo/'+${user.get_id()}" class="IdPhoto"/>
     </button><br/>

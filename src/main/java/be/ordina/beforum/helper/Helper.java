@@ -5,6 +5,8 @@ import java.util.Map;
 
 public class Helper {
     public static String bbcode(String text) {
+    	if (text==null)
+    		return "";
         String html = text;
 
         Map<String,String> bbMap = new HashMap<String , String>();

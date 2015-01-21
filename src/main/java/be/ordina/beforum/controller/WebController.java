@@ -15,6 +15,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;
@@ -51,21 +55,14 @@ public class WebController {
 	@Autowired
 	private CommentService comments; 
 
-	User currentUser=null;
+	private static String defaultZip="9120";
 	
     @RequestMapping(value="/")
-    public String index(HttpSession session, Model model,
+    public String index(HttpSession session, Model model, AbstractAuthenticationToken principal,
     		@RequestParam(value="tag", required=false) String searchTag,
     		@RequestParam(value="tags", required=false) List<String>searchTags,
 			@RequestParam(value="order", required=false) String order) {
-    	System.err.println("in function 'index' - start");
-    	Object auth=session.getAttribute("authenticated_id");
-    	if (auth==null) {
-	    	model.addAttribute("sessionId", session.getId() );
-	    	System.err.println("in function 'index' - go to login page");
-	        return "login";
-    	}
-    	System.err.println("in function 'index' - let's generate some data");
+    	
     	Sort sorting=PropositionService.sortCreated;
     	if (order == null) {
     		order = "time";
@@ -78,16 +75,23 @@ public class WebController {
 			sorting = PropositionService.sortControversial;    		
 		}
 		model.addAttribute("order", order);
-    	model.addAttribute("user", currentUser);
+		
+		String zipCode = defaultZip;
+		if (principal != null)
+		{
+			User currentUser = (User)principal.getPrincipal();
+			zipCode = currentUser.getAddress().getZip();
+			model.addAttribute("user", currentUser);
+		}
     	if ((searchTags==null || searchTags.size()==0) &&
     			(searchTag!=null && !searchTag.equals(""))) {
     		searchTags = new ArrayList<String>();
     		searchTags.add(searchTag);
     	}
     	if (searchTags==null || searchTags.size()==0) {
-    		model.addAttribute("propositions", propositions.getByZip(currentUser.getAddress().getZip(), sorting));
+    		model.addAttribute("propositions", propositions.getByZip(zipCode, sorting));
     	} else {
-    		model.addAttribute("propositions", propositions.getByZipAndTags(currentUser.getAddress().getZip(), searchTags, sorting));    		
+    		model.addAttribute("propositions", propositions.getByZipAndTags(zipCode, searchTags, sorting));    		
     		model.addAttribute("currentTag",searchTag);
     	}
     	List<Tag> tagList = tags.findAll();
@@ -104,22 +108,24 @@ public class WebController {
 		}
 
 		model.addAttribute("tagGroupMap", tagGroupMap);
-    	System.err.println("in function 'index' - go to home page");
     	return "home";
     }
 
-    @RequestMapping(value="/logout")
-    public String logout(HttpSession session, Model model) {
-    	session.removeAttribute("authenticated_id");
-    	return "redirect:/";
-    }   
+    @RequestMapping(value="/login")
+    public String login(HttpSession session, Model model,
+    		@RequestParam(value="identified", required=false) String identified,
+    		@RequestParam(value="logout", required=false) String logout) {
 
-    @RequestMapping(value="/identified")
-    public String identified(HttpSession session, Model model,
-    		@RequestParam(value="tags", required=false) List<String>searchTags) {
+    	if (logout != null)
+    		return "redirect:/";
+    	
+    	if (identified == null)
+        	return "login";
+
+    	
     	Identity id = (Identity)session.getAttribute("eid.identity");
     	if (id==null) {
-    		return index(session, model, null, null, null);
+    		return "redirect:/login";
     	}
     	if ((id.getDocumentType()!=DocumentType.BELGIAN_CITIZEN && id.getDocumentType()!=DocumentType.KIDS_CARD) ||
     			id.getCardValidityDateBegin().after(LocalDate.now()) ||
@@ -130,20 +136,20 @@ public class WebController {
 
     	Address address = (Address)session.getAttribute("eid.address");
     	byte[] photo = (byte[])session.getAttribute("eid.photo");
-    	currentUser = users.logUser(id, address, photo);
-    	session.setAttribute("authenticated_id", currentUser.get_id());
+    	User user = users.logUser(id, address, photo);
+    	Authentication authentication = new PreAuthenticatedAuthenticationToken(user, null, null);
+    	SecurityContextHolder.getContext().setAuthentication(authentication);
     	return "redirect:/";
     }   
 
     @RequestMapping(value="/moreinfo/{userId}")
-    public String info(HttpSession session, Model model,
+    public String info(HttpSession session, Model model, AbstractAuthenticationToken principal,
     		@PathVariable("userId") String userId) {
-    	Object auth=session.getAttribute("authenticated_id");
-    	if (auth==null)
-    		return index(session, model, null, null, null);
+    	if (principal != null)
+    		model.addAttribute("user", (User)principal.getPrincipal());
+
     	User user = users.findUser(userId);
 		model.addAttribute("author", user);
-		model.addAttribute("user", currentUser);
     	return "info";
     }   
 
@@ -159,39 +165,39 @@ public class WebController {
     }
 
     @RequestMapping(value="/addproposition",method=RequestMethod.GET)
-    public String addProposition(HttpSession session, Model model) {
-    	Object auth=session.getAttribute("authenticated_id");
-    	if (auth==null)
-    		return index(session, model, null, null, null);
-		model.addAttribute("user", currentUser);
-		model.addAttribute("tagList", tags.findAll());
+    public String addProposition(HttpSession session, Model model, AbstractAuthenticationToken principal) {
+    	if (principal != null)
+    		model.addAttribute("user", (User)principal.getPrincipal());
+
+    	model.addAttribute("tagList", tags.findAll());
     	return "addproposition";
     }
 
     @RequestMapping(value="/addproposition",method=RequestMethod.POST)
-    public String addProposition(HttpSession session, Model model,
+    public String addProposition(HttpSession session, Model model, AbstractAuthenticationToken principal,
     			@RequestParam(value="title") String title,
     			@RequestParam(value="text") String text,
     			@RequestParam(value="tags") List<String> tags) {
-    	Object auth=session.getAttribute("authenticated_id");
-    	if (auth==null)
-    		return "redirect:/";
-    	Identity id = (Identity)session.getAttribute("eid.identity");
-    	Address address = (Address)session.getAttribute("eid.address");
-    	propositions.save((String)auth, id.getFirstName(), id.getName(), currentUser.getOfficial(),
+    	User currentUser = (User)principal.getPrincipal();
+
+    	User.Identity id = currentUser.getIdentity();
+    	User.Address address = currentUser.getAddress();
+    	propositions.save(currentUser.get_id(), id.getFirstName(), id.getName(), currentUser.getOfficial(),
     					  address.getZip(), title, text, tags);
     	return "redirect:/";
     }   
 
     @RequestMapping(value="/proposition/{propId}",method=RequestMethod.GET)
-    public String proposition(HttpSession session, Model model,
+    public String proposition(HttpSession session, Model model, AbstractAuthenticationToken principal,
     		@PathVariable("propId") String propId) {
-    	Object auth=session.getAttribute("authenticated_id");
-    	if (auth==null)
-    		return index(session, model, null, null, null);
-		model.addAttribute("user", currentUser);
+    	Vote vote = null;
+    	if (principal != null) {
+        	User currentUser = (User)principal.getPrincipal();
+    		model.addAttribute("user", currentUser);
+    		vote = propositions.getVote(propId, currentUser.get_id());
+    	}
+    	
     	model.addAttribute("proposition", propositions.get(propId));
-    	Vote vote = propositions.getVote(propId, (String)auth);
     	int voteDir=0;
     	if (vote != null)
     		voteDir = vote.getDirection();
@@ -200,10 +206,9 @@ public class WebController {
     	return "proposition";
     }
 
-    @RequestMapping(value="/comments/{top}/{parentId}",method=RequestMethod.GET)
+    @RequestMapping(value="/comments/{parentId}",method=RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<List<Comment>> comments(HttpSession session, Model model,
-    		@PathVariable("top") int top,
     		@PathVariable("parentId") String parentId) {
     	HttpHeaders responseHeaders = new HttpHeaders();
     	responseHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -214,68 +219,54 @@ public class WebController {
 
     @RequestMapping(value="/voteComment/{id}/{direction}",method=RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<Integer> voteComment(HttpSession session, Model model,
+    public ResponseEntity<Integer> voteComment(HttpSession session, Model model, AbstractAuthenticationToken principal,
     		@PathVariable("id") String id,
     		@PathVariable("direction") int direction) {
+    	User currentUser = (User)principal.getPrincipal();
+
     	HttpHeaders responseHeaders = new HttpHeaders();
     	responseHeaders.setContentType(MediaType.APPLICATION_JSON);
     	responseHeaders.set("Content-Disposition", "attachment");
-    	int result = comments.registerVote ((String)session.getAttribute("authenticated_id"), id, direction);
+    	int result = comments.registerVote (currentUser.get_id(), id, direction);
     	return new ResponseEntity<Integer>(new Integer(result), responseHeaders, HttpStatus.OK);
     }
 
     @RequestMapping(value="/voteProposal/{id}/{direction}",method=RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<List<Integer>> voteProposal(HttpSession session, Model model,
+    public ResponseEntity<List<Integer>> voteProposal(HttpSession session, Model model, AbstractAuthenticationToken principal,
     		@PathVariable("id") String id,
     		@PathVariable("direction") int direction) {
+    	User currentUser = (User)principal.getPrincipal();
+
     	HttpHeaders responseHeaders = new HttpHeaders();
     	responseHeaders.setContentType(MediaType.APPLICATION_JSON);
     	responseHeaders.set("Content-Disposition", "attachment");
-    	List<Integer> result = propositions.registerVote ((String)session.getAttribute("authenticated_id"), id, direction);
+    	List<Integer> result = propositions.registerVote (currentUser.get_id(), id, direction);
     	return new ResponseEntity<List<Integer>>(result, responseHeaders, HttpStatus.OK);
     }
 
-    @RequestMapping(value="/proposition/{propId}",method=RequestMethod.POST, params="favor")
-    public String voteFavor(HttpSession session, Model model,
-    			@PathVariable("propId") String propId) {
-    	propositions.registerVote ((String)session.getAttribute("authenticated_id"), propId, 1);
-    	return "redirect:/proposition/"+propId;
-    }
-
-    @RequestMapping(value="/proposition/{propId}",method=RequestMethod.POST, params="against")
-    public String voteAgainst(HttpSession session, Model model,
-    			@PathVariable("propId") String propId) {
-    	propositions.registerVote ((String)session.getAttribute("authenticated_id"), propId, -1);
-    	return "redirect:/proposition/"+propId;
-    }
-
     @RequestMapping(value="/proposition/{propId}",method=RequestMethod.POST, params="comment")
-    public String comment(HttpSession session, Model model,
+    public String comment(HttpSession session, Model model, AbstractAuthenticationToken principal,
     			@PathVariable("propId") String propId,
     			@RequestBody MultiValueMap<String,String> body) {
-    	Object auth=session.getAttribute("authenticated_id");
-    	if (auth==null)
-    		return "redirect:/";
+    	User currentUser = (User)principal.getPrincipal();
 
     	String comment = body.getFirst("comment_text");
-    	Identity id = (Identity)session.getAttribute("eid.identity");
-    	comments.addComment((String)auth, id.getFirstName(), id.getName(), currentUser.getOfficial(), propId, true, comment);
+    	User.Identity id = currentUser.getIdentity();
+    	comments.addComment(currentUser.get_id(), id.getFirstName(), id.getName(), currentUser.getOfficial(), propId, true, comment);
     	return "redirect:/proposition/"+propId;
     }
 
     @RequestMapping(value="/subcomment/{propId}/{commentId}",method=RequestMethod.POST, params="comment")
-    public String subcomment(HttpSession session, Model model,
+    public String subcomment(HttpSession session, Model model, AbstractAuthenticationToken principal,
 			    @PathVariable("propId") String propId,
     			@PathVariable("commentId") String commentId,
     			@RequestBody MultiValueMap<String,String> body) {
-    	Object auth=session.getAttribute("authenticated_id");
-    	if (auth==null)
-    		return "redirect:/";
+    	User currentUser = (User)principal.getPrincipal();
 
     	String comment = body.getFirst("comment_text");
-    	Identity id = (Identity)session.getAttribute("eid.identity");
-    	comments.addComment((String)auth, id.getFirstName(), id.getName(), currentUser.getOfficial(), commentId, false, comment);
+    	User.Identity id = currentUser.getIdentity();
+    	comments.addComment(currentUser.get_id(), id.getFirstName(), id.getName(), currentUser.getOfficial(), commentId, false, comment);
     	return "redirect:/proposition/"+propId;
     }
 

@@ -47,6 +47,8 @@ public class WebConfig {
         factory.addConnectorCustomizers((TomcatConnectorCustomizer) (Connector con) -> {
             con.setScheme("https");
             con.setSecure(true);
+            con.setPort(8443);
+            con.setProxyPort(8443);
             Http11NioProtocol proto = (Http11NioProtocol) con.getProtocolHandler();
             proto.setSSLEnabled(true);
             proto.setKeystoreFile(keystoreFile);
