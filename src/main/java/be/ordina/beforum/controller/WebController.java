@@ -114,7 +114,7 @@ public class WebController {
     	return "home";
     }
 
-    @RequestMapping(value="/login")
+    @RequestMapping(value="/login", method=RequestMethod.GET)
     public String login(HttpServletRequest currentRequest, HttpSession session, Model model,
     		@RequestParam(value="identified", required=false) String identified,
     		@RequestParam(value="logout", required=false) String logout) {
@@ -187,7 +187,7 @@ public class WebController {
 
     	User.Identity id = currentUser.getIdentity();
     	User.Address address = currentUser.getAddress();
-    	propositions.save(currentUser.get_id(), id.getFirstName(), id.getName(), currentUser.getOfficial(),
+    	propositions.save(currentUser.get_id(), id.getFirstName(), id.getName(), currentUser.getRole(),
     					  address.getZip(), title, text, tags);
     	return "redirect:/";
     }   
@@ -258,7 +258,7 @@ public class WebController {
 
     	String comment = body.getFirst("comment_text");
     	User.Identity id = currentUser.getIdentity();
-    	comments.addComment(currentUser.get_id(), id.getFirstName(), id.getName(), currentUser.getOfficial(), propId, true, comment);
+    	comments.addComment(currentUser.get_id(), id.getFirstName(), id.getName(), currentUser.getRole(), propId, true, comment);
     	return "redirect:/proposition/"+propId;
     }
 
@@ -271,7 +271,7 @@ public class WebController {
 
     	String comment = body.getFirst("comment_text");
     	User.Identity id = currentUser.getIdentity();
-    	comments.addComment(currentUser.get_id(), id.getFirstName(), id.getName(), currentUser.getOfficial(), commentId, false, comment);
+    	comments.addComment(currentUser.get_id(), id.getFirstName(), id.getName(), currentUser.getRole(), commentId, false, comment);
     	return "redirect:/proposition/"+propId;
     }
 

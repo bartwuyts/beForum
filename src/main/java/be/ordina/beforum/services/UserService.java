@@ -44,4 +44,7 @@ public class UserService {
 		return users.findBy_id(userId);
 	}
 
+	public User findEmail(String email) {
+		return users.findByEmail(email);
+	}
 }

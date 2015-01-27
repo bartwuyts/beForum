@@ -13,24 +13,37 @@
     <div class="tabs-content">
      <div class="content active" id="panel1">
       <div class="body">
-	    Inloggen met eID
-	    <script src="https://www.java.com/js/deployJava.js"></script>
-	    <script th:inline="javascript">
+        <div class="loginOption">
+	    Als je al een account hebt kun je aanmelden door je e-mail en wachtwoord in te vullen, of door je eID nu in te steken
+	    <br/>
+	    <form method="POST">
+	     <input type="text" name="email" placeholder="e-mail"/>
+	     <input type="password" name="password" placeholder="wachtwoord"/>
+	     <input type="submit" value="aanmelden"/>
+	    </form>
+	    </div>
+	    <div class="loginOption">
+	      Als je nog geen account hebt kun je er een aanmaken door je eID nu in te steken.
+	      <div>
+	      <script src="https://www.java.com/js/deployJava.js"></script>
+	      <script th:inline="javascript">
 	            var attributes = {
 	                code :'be.fedict.eid.applet.Applet.class',
 	                archive :'eid-applet-package-1.1.3.jar',
 	                width :400,
-	                height :300
+	                height :100
 	            };
 	            var parameters = {
 	                TargetPage :'login?identified=1',
 	                AppletService : 'applet-service;jsessionid='+/*[[${sessionId}]]*/,
-	                BackgroundColor : '#ffffff',
+	                BackgroundColor : '#F3F3F3',
 	                Language : 'nl'
 	            };
 	            var version = '1.6';
 	            deployJava.runApplet(attributes, parameters, version);
-	    </script>
+	      </script>
+	      </div>
+        </div>
 	  </div>
      </div>
      <div class="content" id="panel2">

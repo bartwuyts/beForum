@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.web.util.HtmlUtils;
 
 import be.ordina.beforum.helper.Helper;
+import be.ordina.beforum.model.User.Role;
 import lombok.Data;
 
 @Data
@@ -16,7 +17,7 @@ public class Comment {
 		private String id;
 		private String firstName;
 		private String lastName;
-		private String official;
+		private Role role;
 	}
 
 	@Id

@@ -171,6 +171,15 @@
     margin : 1em;
 }
 
+.loginOption {
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    background-color : #F3F3F3;
+    padding : 1em;
+    margin : 1em;
+}
+
 .comments .title{
 	font-size : 1.2em;
 	font-weight : 500;

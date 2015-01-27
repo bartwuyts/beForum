@@ -135,7 +135,7 @@ function voteComment(id, direction) {
 		      </div>
 		      <div class="small-11 columns">
 		        <div class="row creator">
-                  <a th:href="'/moreinfo/'+${comment.creator.id}" th:text="${comment.creator.firstName}+' '+${comment.creator.lastName}">creator</a><span class="official" th:if="${comment.creator.official}" th:text="${comment.creator.official}">official</span><span th:text="' gaf volgende reactie op '+${#calendars.format(comment.created,'dd/MM/yyyy')}+' om '+${#calendars.format(comment.created,'hh:mm')}"></span>
+                  <a th:href="'/moreinfo/'+${comment.creator.id}" th:text="${comment.creator.firstName}+' '+${comment.creator.lastName}">creator</a><span class="official" th:if="${comment.creator.role!=null &amp;&amp; comment.creator.role.officialComment==true}" th:text="${comment.creator.role.description}">official</span><span th:text="' gaf volgende reactie op '+${#calendars.format(comment.created,'dd/MM/yyyy')}+' om '+${#calendars.format(comment.created,'hh:mm')}"></span>
                   <span class="icons">
                   <span class="icon"><i class="fa fa-comments-o fa-1x"></i></span>
                   <span th:text="${comment.childComments}+' reacties'"></span>

@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import be.ordina.beforum.model.Proposition;
+import be.ordina.beforum.model.User.Role;
 import be.ordina.beforum.model.Vote;
 import be.ordina.beforum.repository.PropositionRepository;
 import be.ordina.beforum.repository.VoteRepository;
@@ -123,14 +124,14 @@ public class PropositionService {
         return votes.findByIdAndVoter(propId, auth);    	
     }
     
-    public Proposition save(String authorId, String authorFirstName, String authorName, String official,
+    public Proposition save(String authorId, String authorFirstName, String authorName, Role authorRole,
     				 String zip, String title, String text, List<String> tags) {
     	Proposition prop=new Proposition();
     	Proposition.UserSummary creator = prop.new UserSummary();
     	creator.setId(authorId);
     	creator.setFirstName(authorFirstName);
     	creator.setLastName(authorName);
-    	creator.setOfficial(official);
+    	creator.setRole(authorRole);
     	prop.setCreator(creator);
     	prop.setZipcode(zip);
     	prop.setCreated(new Date());

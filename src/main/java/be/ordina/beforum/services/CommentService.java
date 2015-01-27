@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import be.ordina.beforum.model.Comment;
 import be.ordina.beforum.model.Proposition;
+import be.ordina.beforum.model.User.Role;
 import be.ordina.beforum.model.Vote;
 import be.ordina.beforum.repository.CommentRepository;
 import be.ordina.beforum.repository.PropositionRepository;
@@ -24,7 +25,7 @@ public class CommentService {
 	@Autowired
 	private VoteRepository votes; 
 
-	public Comment addComment(String authorId, String authorFirstName, String authorName, String authorOfficial,
+	public Comment addComment(String authorId, String authorFirstName, String authorName, Role authorRole,
 							  String parentId, boolean toplevel, String text) {
 		Comment comment = new Comment();
 		comment.setParentId(parentId);
@@ -32,7 +33,7 @@ public class CommentService {
     	creator.setId(authorId);
     	creator.setFirstName(authorFirstName);
     	creator.setLastName(authorName);
-    	creator.setOfficial(authorOfficial);
+    	creator.setRole(authorRole);
 		comment.setCreator(creator);
 		comment.setCreated(new Date());
 		comment.setToplevel(toplevel);

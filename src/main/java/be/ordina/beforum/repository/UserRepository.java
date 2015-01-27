@@ -11,6 +11,7 @@ import be.ordina.beforum.model.User;
 public interface UserRepository extends PagingAndSortingRepository<User, String> {
 
 	User findBy_id(String id);
+	User findByEmail(String email);
     List<User> findByAddressZip(int zipcode);
     Page<User> findByAddressZip(int zipcode, Pageable pageable);
     User findByIdentityNationalNumber(String nationalNumber);
