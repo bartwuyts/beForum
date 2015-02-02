@@ -159,6 +159,18 @@ public class WebController {
     	return "info";
     }   
 
+    @RequestMapping(value="/moreinfome/{userId}")
+    public String infome(HttpSession session, Model model,
+    		@PathVariable("userId") String userId) {
+    	Object auth=session.getAttribute("authenticated_id");
+    	if (auth==null)
+    		return index(session, model, null, null, null);
+    	User user = users.findUser(userId);
+		model.addAttribute("author", user);
+		model.addAttribute("user", currentUser);
+    	return "infome";
+    }   
+
     @RequestMapping(value="/photo/{userId}")
     @ResponseBody
     public ResponseEntity<byte[]> photo(HttpSession session,
