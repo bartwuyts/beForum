@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: head"></head>
+<body>
+<div th:replace="fragments/header :: header"></div>
+
+<br/>
+<br/>
+
+<div class="row collapse">
+  <div class="body">
+    <div class="row">
+		<span class="caption" th:text="${#authentication.getPrincipal().getIdentity().getFirstName()}+' '+${#authentication.getPrincipal().getIdentity().getName()}">Naam</span>
+		<div class="row">
+		    <img th:src="'/photo/'+${#authentication.getPrincipal().get_id()}" />
+		</div>
+        <div class="row">
+		    Actief sinds <span th:text="${#calendars.format(#authentication.getPrincipal().getFirstLogin(),'dd MMMM yyyy')}"></span>
+		    <br/>
+		    Gebruikte tags
+		</div>
+		<form method="POST">
+		    <span>Email</span>		 
+            <td> <input type="text" name="email" th:value="${#authentication.getPrincipal().email}"/> </td>	
+		    <div>
+		        <span>paswoord</span>		 
+                <input type="text" name="password" th:value="${#authentication.getPrincipal().password}"/>
+	        </div>
+	        <input type="submit" value="Submit" />
+	    </form>		
+	</div>
+  </div>
+</div>
+
+</body>
+</html>

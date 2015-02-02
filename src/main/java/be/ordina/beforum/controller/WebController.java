@@ -155,6 +155,12 @@ public class WebController {
     	return "info";
     }   
 
+    @RequestMapping(value="/moreinfome/{userId}")
+    public String infome(HttpSession session, Model model,
+    		@PathVariable("userId") String userId) {
+    	return "infome";
+    }   
+
     @RequestMapping(value="/photo/{userId}")
     @ResponseBody
     public ResponseEntity<byte[]> photo(HttpSession session,
