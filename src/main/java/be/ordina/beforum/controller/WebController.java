@@ -36,6 +36,7 @@ import be.fedict.eid.applet.service.DocumentType;
 import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.Address;
 import be.ordina.beforum.model.Comment;
+import be.ordina.beforum.model.Role;
 import be.ordina.beforum.model.Tag;
 import be.ordina.beforum.model.TagGroup;
 import be.ordina.beforum.model.User;
@@ -253,12 +254,16 @@ public class WebController {
     @RequestMapping(value="/proposition/{propId}",method=RequestMethod.POST, params="comment")
     public String comment(HttpSession session, Model model, AbstractAuthenticationToken principal,
     			@PathVariable("propId") String propId,
+    			@RequestParam(value="official", required=false) boolean official,
     			@RequestBody MultiValueMap<String,String> body) {
     	User currentUser = (User)principal.getPrincipal();
 
     	String comment = body.getFirst("comment_text");
     	User.Identity id = currentUser.getIdentity();
-    	comments.addComment(currentUser.get_id(), id.getFirstName(), id.getName(), currentUser.getRole(), propId, true, comment);
+    	Role role = null;
+    	if (official)
+    		role = currentUser.getRole();
+    	comments.addComment(currentUser.get_id(), id.getFirstName(), id.getName(), role, propId, true, comment);
     	return "redirect:/proposition/"+propId;
     }
 
@@ -266,12 +271,16 @@ public class WebController {
     public String subcomment(HttpSession session, Model model, AbstractAuthenticationToken principal,
 			    @PathVariable("propId") String propId,
     			@PathVariable("commentId") String commentId,
+    			@RequestParam(value="official", required=false) boolean official,
     			@RequestBody MultiValueMap<String,String> body) {
     	User currentUser = (User)principal.getPrincipal();
 
     	String comment = body.getFirst("comment_text");
     	User.Identity id = currentUser.getIdentity();
-    	comments.addComment(currentUser.get_id(), id.getFirstName(), id.getName(), currentUser.getRole(), commentId, false, comment);
+    	Role role = null;
+    	if (official)
+    		role = currentUser.getRole();
+    	comments.addComment(currentUser.get_id(), id.getFirstName(), id.getName(), role, commentId, false, comment);
     	return "redirect:/proposition/"+propId;
     }
 

@@ -36,6 +36,10 @@ function voteComment(id, direction) {
 }
 </script>
 <script th:inline="javascript">
+   var test = /*[[ ${user.getRole()!=null}? (${user.getRole().isOfficialComment()}? 'test1' : 'test2') : 'test2' ]]*/ 'test' 
+</script>
+<script th:inline="javascript">
+//<![CDATA[
      function expand(id, propId) {
          $('#sub_'+id).toggle();
          $.ajax({
@@ -49,10 +53,14 @@ function voteComment(id, direction) {
                 $(this).html("");
                 for (var comment in data) {
                     var created = new Date(data[comment].created);
+                    var official = '';
+                    if (data[comment].creator.role!=null && data[comment].creator.role.officialComment)
+                      official = '<span>Officieel</span>'                    
                     $(this).append(
                     		'<div class="row comment">'+
                             ' <div class="small-1 columns">'+
                             '    <img src="/photo/'+data[comment].creator.id+'" class="CreatorPhoto"/>'+
+                            official+
                             ' </div>'+
                             ' <div class="small-11 columns">'+
                             '  <div class="row creator">'+
@@ -72,13 +80,13 @@ function voteComment(id, direction) {
                             '    <a class="voteIcon" id="comment_favor_'+data[comment]._id+'" onclick="voteComment(\''+data[comment]._id+'\',-1)"><i class="fa fa-thumbs-down fa-1x"></i></a>'+
                             '   </span>'+
                             '  </div>'+
-                            '    <div id="sub_'+data[comment]._id+'" class="subcomments">'+
-                            
+                            '    <div id="sub_'+data[comment]._id+'" class="subcomments">'+                            
                             '      <div class="row richinputdiv" id="tb_textbox_'+data[comment]._id+'">'+
                             '        <form action="/subcomment/'+propId+'/'+data[comment]._id+'" method="post">'+
                             '          <textarea id="comment_text_'+data[comment]._id+'" class="richinput comment_textarea" name="comment_text"></textarea>'+
                             '          <input type="submit" name="comment" value="toevoegen" />'+
-                            '        </form>'+
+                            /*[[ ${user.getRole()!=null && user.getRole().isOfficialComment()}? '<input type="checkbox" name="official" value="true"> Officieel commentaar</input>' : '' ]]*/ ''
+                            +'        </form>'+
                             '      </div>'+
                             '     <div id="subcomments_'+data[comment]._id+'" >Laden...</div>'+
                             '    </div>'+
@@ -93,6 +101,7 @@ function voteComment(id, direction) {
                     emoticonsRoot:"/sceditor/"});
          });
      }
+//]]>
 </script>
     
 <br/>
@@ -131,7 +140,8 @@ function voteComment(id, direction) {
 	       <div th:each="comment : ${comments}">
 		     <div class="row comment">
 		      <div class="small-1 columns">
-		          <img th:src="'/photo/'+${comment.creator.id}" class="CreatorPhoto"/>
+		          <img th:src="'/photo/'+${comment.creator.id}" class="CreatorPhoto" />
+		          <span th:if="${comment.creator.getRole()!=null &amp;&amp; comment.creator.getRole().isOfficialComment()}">Officieel</span>
 		      </div>
 		      <div class="small-11 columns">
 		        <div class="row creator">
@@ -156,6 +166,7 @@ function voteComment(id, direction) {
 			       <form th:action="'/subcomment/'+${proposition._id}+'/'+${comment._id}" method="post">
 			        <textarea class="richinput comment_textarea" name="comment_text" rows="7" cols="80"></textarea>
 			        <input type="submit" name="comment" value="toevoegen" />
+                    <input th:if="${user.getRole()!=null &amp;&amp; user.getRole().isOfficialComment()}" type="checkbox" name="official" value="true"> Officieel commentaar</input>
 			       </form>
 			       <div th:id="'subcomments_'+${comment._id}" >Laden...</div>
 			    </div>
@@ -179,6 +190,7 @@ function voteComment(id, direction) {
           <form method="POST">
             <textarea id="comment_text" name="comment_text"></textarea>
             <input type="submit" name="comment" value="toevoegen" />
+            <input th:if="${user.getRole()!=null &amp;&amp; user.getRole().isOfficialComment()}" type="checkbox" name="official" value="true"> Officieel commentaar</input>
           </form>
         </div>
       </div>

@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import be.ordina.beforum.model.Proposition;
-import be.ordina.beforum.model.User.Role;
+import be.ordina.beforum.model.Role;
 import be.ordina.beforum.model.Vote;
 import be.ordina.beforum.repository.PropositionRepository;
 import be.ordina.beforum.repository.VoteRepository;

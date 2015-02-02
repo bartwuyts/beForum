@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import be.ordina.beforum.model.Comment;
 import be.ordina.beforum.model.Proposition;
-import be.ordina.beforum.model.User.Role;
+import be.ordina.beforum.model.Role;
 import be.ordina.beforum.model.Vote;
 import be.ordina.beforum.repository.CommentRepository;
 import be.ordina.beforum.repository.PropositionRepository;

@@ -57,14 +57,6 @@ public class User implements UserDetails {
 		private String zip;
 		private String city;
 	}
-	@Data
-	public class Role {
-		private String description;
-		private boolean officialComment;
-		private boolean officialProposal;
-		private boolean townAdmin;
-		private boolean generalAdmin;
-	}
 		
 	public void fromEID(be.fedict.eid.applet.service.Identity id, 
 						be.fedict.eid.applet.service.Address addr,

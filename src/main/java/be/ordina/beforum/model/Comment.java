@@ -6,7 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.web.util.HtmlUtils;
 
 import be.ordina.beforum.helper.Helper;
-import be.ordina.beforum.model.User.Role;
+import be.ordina.beforum.model.Role;
 import lombok.Data;
 
 @Data
