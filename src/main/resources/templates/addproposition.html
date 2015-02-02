@@ -10,7 +10,7 @@
 <div class="row collapse">
   <div class="body">
     <div class="row">
-        <span class="caption" th:text="'Nieuw voorstel '+${user.mainCity}">Nieuw voorstel</span>
+        <span class="caption" th:text="'Nieuw voorstel '+${#authentication.getPrincipal().mainCity}">Nieuw voorstel</span>
         <div class="row">
 		  <form method="POST">
 			<div class="row">

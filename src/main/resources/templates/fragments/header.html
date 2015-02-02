@@ -41,10 +41,10 @@
    </div>
    <div sec:authorize="isAuthenticated()"  class="small-1 columns">
     <button href="#" data-dropdown="drop1" aria-controls="drop1" aria-expanded="false" class="button dropdown">
-     <img th:src="'/photo/'+${user.get_id()}" class="IdPhoto"/>
+     <img th:src="'/photo/'+${#authentication.getPrincipal().get_id()}" class="IdPhoto"/>
     </button><br/>
     <ul id="drop1" data-dropdown-content="" class="f-dropdown" aria-hidden="true" tabindex="-1">
-     <li><a th:href="'/moreinfo/'+${user.get_id()}">Profiel</a></li>
+     <li><a th:href="'/moreinfo/'+${#authentication.getPrincipal().get_id()}">Profiel</a></li>
      <li><a href="/logout">Uitloggen</a></li>
     </ul>
    </div>

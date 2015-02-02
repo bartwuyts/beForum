@@ -85,7 +85,6 @@ public class WebController {
 		{
 			User currentUser = (User)principal.getPrincipal();
 			zipCode = currentUser.getAddress().getZip();
-			model.addAttribute("user", currentUser);
 		}
     	if ((searchTags==null || searchTags.size()==0) &&
     			(searchTag!=null && !searchTag.equals(""))) {
@@ -151,9 +150,6 @@ public class WebController {
     @RequestMapping(value="/moreinfo/{userId}")
     public String info(HttpSession session, Model model, AbstractAuthenticationToken principal,
     		@PathVariable("userId") String userId) {
-    	if (principal != null)
-    		model.addAttribute("user", (User)principal.getPrincipal());
-
     	User user = users.findUser(userId);
 		model.addAttribute("author", user);
     	return "info";
@@ -172,9 +168,6 @@ public class WebController {
 
     @RequestMapping(value="/addproposition",method=RequestMethod.GET)
     public String addProposition(HttpSession session, Model model, AbstractAuthenticationToken principal) {
-    	if (principal != null)
-    		model.addAttribute("user", (User)principal.getPrincipal());
-
     	model.addAttribute("tagList", tags.findAll());
     	return "addproposition";
     }
@@ -199,7 +192,6 @@ public class WebController {
     	Vote vote = null;
     	if (principal != null) {
         	User currentUser = (User)principal.getPrincipal();
-    		model.addAttribute("user", currentUser);
     		vote = propositions.getVote(propId, currentUser.get_id());
     	}
     	
