@@ -2,6 +2,7 @@ package be.ordina.beforum.controller;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,6 +38,7 @@ import be.fedict.eid.applet.service.DocumentType;
 import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.Address;
 import be.ordina.beforum.model.Comment;
+import be.ordina.beforum.model.Proposition;
 import be.ordina.beforum.model.Role;
 import be.ordina.beforum.model.Tag;
 import be.ordina.beforum.model.TagGroup;
@@ -200,7 +203,9 @@ public class WebController {
         	User currentUser = (User)principal.getPrincipal();
     		vote = propositions.getVote(propId, currentUser.get_id());
     	}
-    	
+    	Proposition test = propositions.get(propId);
+    	if (test.getStatus().equals(Proposition.Status.DENIED))
+    		vote=null;
     	model.addAttribute("proposition", propositions.get(propId));
     	int voteDir=0;
     	if (vote != null)
@@ -208,6 +213,16 @@ public class WebController {
     	model.addAttribute("vote", voteDir);
     	model.addAttribute("comments", comments.find(propId));
     	return "proposition";
+    }
+
+    @RequestMapping(value="/proposition/status/{propId}",method=RequestMethod.POST)
+    public String updateProposition(HttpSession session, Model model, AbstractAuthenticationToken principal,
+    		@PathVariable("propId") String propId,
+			@RequestParam(value="status", required=false) String status,
+			@RequestParam(value="date", required=false) @DateTimeFormat(pattern="dd/MM/yyyy") Date date,
+			@RequestParam(value="amount", required=false) double amount) {
+    	propositions.update(propId, status, date, amount);
+    	return "redirect:/proposition/"+propId;
     }
 
     @RequestMapping(value="/comments/{parentId}",method=RequestMethod.GET)

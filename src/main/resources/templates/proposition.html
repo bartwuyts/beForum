@@ -34,6 +34,23 @@ function voteComment(id, direction) {
         $(this).html(data);
     });
 }
+
+function updateAdmin() {
+    val = $("#adminStatus").val();
+    $("#adminDate").hide();
+    $("#adminAmount").hide();
+    if (val=="CROWDFUNDING") {
+        $("#adminAmount").show();  
+    }
+    if (val=="AGENDA" || val=="PLANNED") {
+        $("#adminDate").show();  
+    }
+}
+
+$(function() {
+    $(".datepicker").datepicker({dateFormat:"dd/mm/yy"});
+    updateAdmin();
+});
 </script>
 <script th:inline="javascript">
    var test = /*[[ ${#authentication.getPrincipal().getRole()!=null}? (${#authentication.getPrincipal().getRole().isOfficialComment()}? 'test1' : 'test2') : 'test2' ]]*/ 'test' 
@@ -204,6 +221,30 @@ function voteComment(id, direction) {
        <div class="row voting">
          <a href="#" class="button favor text-left" th:classappend="${vote==1}?'disabled':''" th:onclick="'voteProposal(&quot;'+${proposition._id}+'&quot;,1);'"><i class="fa fa-thumbs-up fa-1x"></i> Ik stem voor</a><br/>
          <a href="#" class="button against text-left" th:classappend="${vote==-1}?'disabled':''" th:onclick="'voteProposal(&quot;'+${proposition._id}+'&quot;,-1);'"><i class="fa fa-thumbs-down fa-1x"></i> Ik stem tegen</a>
+       </div>
+       <div class="row" th:if="${#authentication.getPrincipal().getRole()!=null &amp;&amp; #authentication.getPrincipal().getRole().isTownAdmin()}">
+         <form th:action="'/proposition/status/'+${proposition._id}" method="POST">
+           Status
+           <select id="adminStatus" name="status" onchange="updateAdmin()">
+            <option value="NEW" th:selected="${proposition.status==T(be.ordina.beforum.model.Proposition.Status).NEW}">Nieuw voorstel</option>
+            <option value="AGENDA" th:selected="${proposition.status==T(be.ordina.beforum.model.Proposition.Status).AGENDA}">Op agenda gezet</option>
+            <option value="DENIED" th:selected="${proposition.status==T(be.ordina.beforum.model.Proposition.Status).DENIED}">Afgekeurd</option>
+            <option value="APPROVED" th:selected="${proposition.status==T(be.ordina.beforum.model.Proposition.Status).APPROVED}">Goedgekeurd</option>
+            <option value="CROWDFUNDING" th:selected="${proposition.status==T(be.ordina.beforum.model.Proposition.Status).CROWDFUNDING}">Goedgekeurd voor crowdfunding</option>
+            <option value="PLANNED" th:selected="${proposition.status==T(be.ordina.beforum.model.Proposition.Status).PLANNED}">Ingepland</option>
+            <option value="EXECUTING" th:selected="${proposition.status==T(be.ordina.beforum.model.Proposition.Status).EXECUTING}">In uitvoering</option>
+            <option value="EXECUTED" th:selected="${proposition.status==T(be.ordina.beforum.model.Proposition.Status).EXECUTED}">Uitgevoerd</option>
+           </select>
+           <div id="adminDate">
+             Datum
+             <input type="text" class="datepicker" name="date" readonly="true" th:value="${#calendars.format(proposition.date,'dd/MM/yyyy')}" />
+           </div>
+           <div id="adminAmount">
+             Bedrag
+             <input type="text" name="amount" th:value="${proposition.amount}" />
+           </div>
+           <input type="submit" value="update status" />
+         </form>
        </div>
      </div>
     </div>

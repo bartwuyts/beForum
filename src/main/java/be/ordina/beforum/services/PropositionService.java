@@ -149,4 +149,39 @@ public class PropositionService {
     	prop.setTags(tags);
     	return propositions.save(prop);
     }
+    
+    public Proposition update(String propId, String status, Date date, double amount) {
+    	Proposition prop = propositions.findBy_id(propId);
+    	switch(status) {
+    		case "NEW": 
+    			prop.setStatus(Proposition.Status.NEW);
+    			break;
+    		case "AGENDA": 
+    			prop.setStatus(Proposition.Status.AGENDA);
+    			break;
+    		case "DENIED": 
+    			prop.setStatus(Proposition.Status.DENIED);
+    			break;
+    		case "APPROVED": 
+    			prop.setStatus(Proposition.Status.APPROVED);
+    			break;
+    		case "CROWDFUNDING": 
+    			prop.setStatus(Proposition.Status.CROWDFUNDING);
+    			break;
+    		case "PLANNED": 
+    			prop.setStatus(Proposition.Status.PLANNED);
+    			break;
+    		case "EXECUTING": 
+    			prop.setStatus(Proposition.Status.EXECUTING);
+    			break;
+    		case "EXECUTED": 
+    			prop.setStatus(Proposition.Status.EXECUTED);
+    			break;
+    		default: 
+    			return null;
+    	}
+    	prop.setDate(date);
+    	prop.setAmount(amount);
+    	return propositions.save(prop);
+    }
 }

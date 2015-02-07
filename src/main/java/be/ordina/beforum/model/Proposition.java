@@ -21,6 +21,16 @@ public class Proposition {
 		private Role role;
 	}
 	
+	public enum Status {
+		NEW,
+		AGENDA,
+		DENIED,
+		APPROVED,
+		CROWDFUNDING,
+		PLANNED,
+		EXECUTING,
+		EXECUTED
+	}
 	@Id
 	private String _id;
 	private String zipcode;
@@ -34,6 +44,10 @@ public class Proposition {
 	private int votesTotal;
 	private int comments;
 	private List<String> tags;
+	
+	private Status status;
+	private Date date;
+	private double amount;
 	
 	public String getText() {
 		return Helper.bbcode(HtmlUtils.htmlEscape(text));
