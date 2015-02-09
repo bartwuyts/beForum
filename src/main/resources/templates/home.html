@@ -6,27 +6,40 @@
 <script type="text/javascript">
 //<![CDATA[
   function addGetParameter (paramName, paramValue) {
-	var url = window.location.href;
+    var url = window.location.href;
 	if (url.indexOf(paramName + "=") >= 0)
 	{
 	    var prefix = url.substring(0, url.indexOf(paramName));
 	    var suffix = url.substring(url.indexOf(paramName));
 	    suffix = suffix.substring(suffix.indexOf("=") + 1);
 	    suffix = (suffix.indexOf("&") >= 0) ? suffix.substring(suffix.indexOf("&")) : "";
-	    url = prefix + paramName + "=" + paramValue + suffix;
+	    if (paramValue=='') {
+	    	if (suffix.length==0)
+	    		url = prefix.substring(0,prefix.length-2)
+	    	else
+	    	    url = prefix + suffix.substring(1);
+	    }
+	    else
+	        url = prefix + paramName + "=" + paramValue + suffix;
 	}
 	else
 	{
-	if (url.indexOf("?") < 0)
-	    url += "?" + paramName + "=" + paramValue;
-	else
-	    url += "&" + paramName + "=" + paramValue;
+	    if (url.indexOf("?") < 0)
+	        url += "?" + paramName + "=" + paramValue;
+	    else
+	        url += "&" + paramName + "=" + paramValue;
 	}
-	window.location.href = url;
+    window.location.href = url;
   }
   
   function setOrder (order) {
-    addGetParameter ("order", order);
+	    addGetParameter ("order", order);
+  }
+  function setTag (tag) {
+	    addGetParameter ("tag", tag);
+  }
+  function setStatus (status) {
+	    addGetParameter ("status", status);
   }
 //]]>
 </script>
@@ -50,12 +63,16 @@
            <label for="select_filter" class="inline">Toon me</label>
           </div>
           <div class="small-8 columns">
-           <select id="select_filter" onchange="location = '/?tag='+this.options[this.selectedIndex].value">
+           <select id="select_status" onchange="setStatus(this.options[this.selectedIndex].value)">
             <option value="">alle</option>
-            <option value="">op agenda</option>
-            <option value="">geplande</option>
-            <option value="">uitgevoerde</option>
-            <option value="">geweigerde</option>
+            <option value="NEW" th:selected="${currentStatus=='NEW'}">nieuwe</option>
+            <option value="AGENDA" th:selected="${currentStatus=='AGENDA'}">op agenda</option>
+            <option value="DENIED" th:selected="${currentStatus=='DENIED'}">afgekeurde</option>
+            <option value="APPROVED" th:selected="${currentStatus=='APPROVED'}">goedgekeurde</option>
+            <option value="CROWDFUNDING" th:selected="${currentStatus=='CROWDFUNDING'}">crowdfunding</option>
+            <option value="PLANNED" th:selected="${currentStatus=='PLANNED'}">geplande</option>
+            <option value="EXECUTING" th:selected="${currentStatus=='EXECUTING'}">in uitvoering</option>
+            <option value="EXECUTED" th:selected="${currentStatus=='EXECUTED'}">uitgevoerde</option>
            </select>
           </div>
          </div>         
@@ -64,7 +81,7 @@
            <label for="select_category" class="inline">idee&euml;n over</label>
           </div>
           <div class="small-8 columns">
-           <select id="select_category" onchange="location = '/?tag='+this.options[this.selectedIndex].value">
+           <select id="select_tag" onchange="setTag(this.options[this.selectedIndex].value)">
             <option value="">alles</option>
             <option th:each="tag : ${tagList}" th:text="${tag.text}" th:value="${tag._id}" th:selected="${tag._id.equals(currentTag)}" />
            </select>
@@ -76,9 +93,9 @@
           </div>
           <div class="small-8 columns">          
            <select onchange="setOrder(this.options[this.selectedIndex].value)">
-            <option value="time">datum</option>
+            <option value="">datum</option>
             <option value="popularity" th:selected="${order.equals('popularity')}">populariteit</option>
-            <option value="controversial" th:selected="${order.equals('controversial')}">aandacht</option>
+            <option value="controversial" th:selected="${order.equals('controversial')}">controversieel</option>
            </select>
           </div>
          </div>

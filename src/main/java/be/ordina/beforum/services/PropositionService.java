@@ -108,9 +108,34 @@ public class PropositionService {
     	return mongoTemplate.aggregate(agg, Proposition.class).getMappedResults();
     }
 
+    public List<Proposition> getByZipAndStatus(String zip, String status, Sort order) {
+    	TypedAggregation<Proposition> agg = Aggregation.newAggregation(Proposition.class,
+    			Aggregation.match(Criteria.where("status").is(status)),
+    			Aggregation.project("created","creator","text","title","votesFavor","votesAgainst",
+    								"votesDiff","comments","tags")
+    				.andExpression("votesFavor + votesAgainst").as(votesTotal)
+    				.andExpression("votesFavor - votesAgainst").as(votesDiff),
+    			Aggregation.sort(order)
+    			);
+    	return mongoTemplate.aggregate(agg, Proposition.class).getMappedResults();
+    }
+
     public List<Proposition> getByZipAndTags(String zip, List<String> tags, Sort order) {
     	TypedAggregation<Proposition> agg = Aggregation.newAggregation(Proposition.class,
     			Aggregation.match(Criteria.where("tags").all(tags)),
+    			Aggregation.project("created","creator","text","title","votesFavor","votesAgainst",
+    								"votesDiff","comments","tags")
+    				.andExpression("votesFavor + votesAgainst").as(votesTotal)
+    				.andExpression("votesFavor - votesAgainst").as(votesDiff),
+    			Aggregation.sort(order)
+    			);
+    	return mongoTemplate.aggregate(agg, Proposition.class).getMappedResults();
+    }
+
+    public List<Proposition> getByZipAndTagsAndStatus(String zip, List<String> tags, String status, Sort order) {
+    	TypedAggregation<Proposition> agg = Aggregation.newAggregation(Proposition.class,
+    			Aggregation.match(Criteria.where("tags").all(tags)
+    				 .andOperator(Criteria.where("status").is(status))),
     			Aggregation.project("created","creator","text","title","votesFavor","votesAgainst",
     								"votesDiff","comments","tags")
     				.andExpression("votesFavor + votesAgainst").as(votesTotal)

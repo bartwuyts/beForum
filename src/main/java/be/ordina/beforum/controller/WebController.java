@@ -67,6 +67,7 @@ public class WebController {
     @RequestMapping(value="/")
     public String index(HttpSession session, Model model, AbstractAuthenticationToken principal,
     		@RequestParam(value="tag", required=false) String searchTag,
+    		@RequestParam(value="status", required=false) String searchStatus,
     		@RequestParam(value="tags", required=false) List<String>searchTags,
 			@RequestParam(value="order", required=false) String order) {
     	
@@ -95,9 +96,19 @@ public class WebController {
     		searchTags.add(searchTag);
     	}
     	if (searchTags==null || searchTags.size()==0) {
-    		model.addAttribute("propositions", propositions.getByZip(zipCode, sorting));
+    		if (searchStatus==null) {
+    			model.addAttribute("propositions", propositions.getByZip(zipCode, sorting));
+    		} else {
+    			model.addAttribute("propositions", propositions.getByZipAndStatus(zipCode, searchStatus, sorting));    			
+        		model.addAttribute("currentStatus",searchStatus);
+    		}
     	} else {
-    		model.addAttribute("propositions", propositions.getByZipAndTags(zipCode, searchTags, sorting));    		
+    		if (searchStatus==null) {
+    			model.addAttribute("propositions", propositions.getByZipAndTags(zipCode, searchTags, sorting));
+    		} else {
+    			model.addAttribute("propositions", propositions.getByZipAndTagsAndStatus(zipCode, searchTags, searchStatus, sorting));    			
+        		model.addAttribute("currentStatus",searchStatus);
+    		}
     		model.addAttribute("currentTag",searchTag);
     	}
     	List<Tag> tagList = tags.findAll();
