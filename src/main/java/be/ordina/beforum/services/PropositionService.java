@@ -39,6 +39,8 @@ public class PropositionService {
 	public static final Sort sortCreated = new Sort(new Sort.Order(Sort.Direction.DESC, "created"));
 	public static final Sort sortPopularity = new Sort(new Sort.Order(Sort.Direction.DESC, votesDiff));
 	public static final Sort sortControversial = new Sort(new Sort.Order(Sort.Direction.DESC, votesTotal), new Sort.Order(Sort.Direction.DESC, "comments"));
+
+	private static final String[] homeFields = {"created","creator","text","title","votesFavor","votesAgainst","votesDiff","comments","tags","status","date","amount","amountPledged"};
 	
 	public PropositionService () {	
 	}
@@ -100,7 +102,7 @@ public class PropositionService {
 
     public List<Proposition> getByZip(String zip, Sort order) {
     	TypedAggregation<Proposition> agg = Aggregation.newAggregation(Proposition.class,
-    			Aggregation.project("created","creator","text","title","votesFavor","votesAgainst","votesDiff","comments","tags")
+    			Aggregation.project(homeFields)
     				.andExpression("votesFavor + votesAgainst").as(votesTotal)
     				.andExpression("votesFavor - votesAgainst").as(votesDiff),
     			Aggregation.sort(order)
@@ -175,7 +177,7 @@ public class PropositionService {
     	return propositions.save(prop);
     }
     
-    public Proposition update(String propId, String status, Date date, double amount) {
+    public Proposition update(String propId, String status, Date date, int amount) {
     	Proposition prop = propositions.findBy_id(propId);
     	switch(status) {
     		case "NEW": 

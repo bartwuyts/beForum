@@ -214,9 +214,6 @@ public class WebController {
         	User currentUser = (User)principal.getPrincipal();
     		vote = propositions.getVote(propId, currentUser.get_id());
     	}
-    	Proposition test = propositions.get(propId);
-    	if (test.getStatus().equals(Proposition.Status.DENIED))
-    		vote=null;
     	model.addAttribute("proposition", propositions.get(propId));
     	int voteDir=0;
     	if (vote != null)
@@ -231,7 +228,7 @@ public class WebController {
     		@PathVariable("propId") String propId,
 			@RequestParam(value="status", required=false) String status,
 			@RequestParam(value="date", required=false) @DateTimeFormat(pattern="dd/MM/yyyy") Date date,
-			@RequestParam(value="amount", required=false) double amount) {
+			@RequestParam(value="amount", required=false) int amount) {
     	propositions.update(propId, status, date, amount);
     	return "redirect:/proposition/"+propId;
     }

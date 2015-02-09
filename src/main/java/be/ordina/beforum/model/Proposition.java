@@ -47,7 +47,8 @@ public class Proposition {
 	
 	private Status status;
 	private Date date;
-	private double amount;
+	private int amount;
+	private int amountPledged;
 	
 	public String getText() {
 		return Helper.bbcode(HtmlUtils.htmlEscape(text));

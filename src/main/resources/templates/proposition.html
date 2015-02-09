@@ -43,7 +43,7 @@ function updateAdmin() {
         $("#adminAmount").show();  
         $("#adminDate").show();  
     }
-    if (val=="AGENDA" || val=="PLANNED") {
+    if (val=="AGENDA" || val=="PLANNED" || val=="APPROVED" || val=="DENIED" || val=="EXECUTED") {
         $("#adminDate").show();  
     }
 }
@@ -238,7 +238,7 @@ $(function() {
            </select>
            <div id="adminDate">
              Datum
-             <input type="text" class="datepicker" name="date" readonly="true" th:value="${#calendars.format(proposition.date,'dd/MM/yyyy')}" />
+             <input type="text" class="datepicker" name="date" readonly="true" th:value="${proposition.date}?${#calendars.format(proposition.date,'dd/MM/yyyy')}:''" />
            </div>
            <div id="adminAmount">
              Bedrag

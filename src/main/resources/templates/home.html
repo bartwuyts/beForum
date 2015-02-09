@@ -124,20 +124,44 @@
            </div>
            <div class="row summary" th:utext="${prop.text}">
            </div>
-           <div class="row status" th:if="${prop.votesFavor} - ${prop.votesAgainst} &lt; 5">
-           <div class="progress">
-             <span class="meter" th:style="'width: '+((${prop.votesFavor} - ${prop.votesAgainst})*100/5)+'%'"></span>
+           <div th:switch="${prop.status}">
+            <div th:case="${T(be.ordina.beforum.model.Proposition.Status).AGENDA}" class="progressText">
+             Komt op de gemeenteraad van <span th:text="${#calendars.format(prop.date,'dd/MM/yyyy')}"></span>
+            </div>
+            <div th:case="${T(be.ordina.beforum.model.Proposition.Status).DENIED}" class="progressText">
+             Is op <span th:text="${#calendars.format(prop.date,'dd/MM/yyyy')}"></span> afgekeurd
+            </div>
+            <div th:case="${T(be.ordina.beforum.model.Proposition.Status).APPROVED}" class="progressText">
+             Is op <span th:text="${#calendars.format(prop.date,'dd/MM/yyyy')}"></span> goedgekeurd
+            </div>
+            <div th:case="${T(be.ordina.beforum.model.Proposition.Status).CROWDFUNDING}" class="progressText">
+             <div class="progress">
+               <span class="meter" th:style="'width: '+(${prop.amountPledged}*100/${prop.amount})+'%'"></span>
+             </div>
+             Nog <span th:text="${prop.amount - prop.amountPledged}"></span> euro crowdfunding nodig tegen <span th:text="${#calendars.format(prop.date,'dd/MM/yyyy')}"></span> om te kunnen uitvoeren
+            </div>
+            <div th:case="${T(be.ordina.beforum.model.Proposition.Status).PLANNED}" class="progressText">
+             Wordt op <span th:text="${#calendars.format(prop.date,'dd/MM/yyyy')}"></span> uitgevoerd
+            </div>
+            <div th:case="${T(be.ordina.beforum.model.Proposition.Status).EXECUTING}" class="progressText">
+             Is in uitvoering
+            </div>
+            <div th:case="${T(be.ordina.beforum.model.Proposition.Status).EXECUTED}" class="progressText">
+             Is uitgevoerd sinds <span th:text="${#calendars.format(prop.date,'dd/MM/yyyy')}"></span>
+            </div>
+            <div th:case="*" class="progressText">
+             <div class="progress">
+               <span class="meter" th:style="'width: '+((${prop.votesFavor} - ${prop.votesAgainst})*100/5)+'%'"></span>
+             </div>
+             Nog <span th:text="5 - (${prop.votesFavor} - ${prop.votesAgainst})"></span> voorstanders nodig om het op de gemeenteraad te brengen
+            </div>
            </div>
-           <span class="progressText">
-           Nog <span th:text="5 - (${prop.votesFavor} - ${prop.votesAgainst})"></span> voorstanders nodig om het op de gemeenteraad te brengen
-           </span>
+           </div>
            </div>
            <div class="row tags">
              <a class="tag" th:each="tag : ${prop.tags}" th:href="'/?tag='+${tag}" th:utext="'&lt;i class=&quot;fa fa-tag fa1x&quot;&gt;&lt;/i&gt; '+${tagMap.get(tag)}">1 tag</a>
              <a th:href="'/proposition/'+${prop._id}" class="button right">Lees meer</a>
            </div>
-          </div>
-          </div>
 	     </div>
 	   </div>
 	  </div>
